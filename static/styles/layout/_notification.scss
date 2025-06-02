@@ -1,0 +1,39 @@
+#notification {
+    border-left: 3px solid #0043ce;
+    border-bottom: 1px solid #dbe1e7;
+    background: #edf5ff;
+
+    .notification__details {
+        display: flex;
+        align-items: center;
+        margin-right: auto;
+        margin-left: auto;
+        max-width: 77rem;
+
+        .details__icon {
+            color: #0043ce;
+            flex-shrink: 0;
+            font-size: 1.25rem;
+            width: 54px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .details__message {
+            display: flex;
+            flex-wrap: wrap;
+            padding: .9375rem 0;
+            font-size: 1rem;
+            font-weight: 250;
+            line-height: 1.5em;
+            letter-spacing: 0;
+
+            a {
+                color: #204ff5;
+                text-decoration: none;
+            }
+        }
+    }
+}

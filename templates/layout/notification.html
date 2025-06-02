@@ -1,0 +1,12 @@
+{% if profile and profile['is_suspended'] %}
+<div id="notification">
+    <div class="notification__details">
+        <div class="details__icon">
+            <i class="fa-sharp fa-light fa-ban"></i>
+        </div>
+        <div class="details__message">
+            Leider ist Ihr Account temporär gesperrt. Bitte wenden Sie sich an unseren&nbsp;<a href="/support" target="_blank">Support</a>&nbsp;für weitere Informationen.
+        </div>
+    </div>
+</div>
+{% endif %}

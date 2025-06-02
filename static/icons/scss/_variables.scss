@@ -1,52 +1,55 @@
 // variables
 // --------------------------
 
-$fa-css-prefix          : fa !default;
-$fa-style               : 900 !default;
-$fa-style-family        : "Font Awesome 6 Pro" !default;
+$fa-css-prefix            : fa !default;
+$fa-style                 : 900 !default;
+$fa-style-family          : "Font Awesome 6 Pro" !default;
 
-$fa-display             : inline-block !default;
+$fa-icon-property         : --fa;
+$fa-duotone-icon-property : --fa--fa;
 
-$fa-fw-width            : fa-divide(20em, 16) !default;
-$fa-inverse             : #fff !default;
+$fa-display               : inline-block !default;
 
-$fa-border-color        : #eee !default;
-$fa-border-padding      : .2em .25em .15em !default;
-$fa-border-radius       : .1em !default;
-$fa-border-style        : solid !default;
-$fa-border-width        : .08em !default;
+$fa-fw-width              : fa-divide(20em, 16) !default;
+$fa-inverse               : #fff !default;
 
-$fa-size-scale-2xs      : 10 !default;
-$fa-size-scale-xs       : 12 !default;
-$fa-size-scale-sm       : 14 !default;
-$fa-size-scale-base     : 16 !default;
-$fa-size-scale-lg       : 20 !default;
-$fa-size-scale-xl       : 24 !default;
-$fa-size-scale-2xl      : 32 !default;
+$fa-border-color          : #eee !default;
+$fa-border-padding        : .2em .25em .15em !default;
+$fa-border-radius         : .1em !default;
+$fa-border-style          : solid !default;
+$fa-border-width          : .08em !default;
+
+$fa-size-scale-2xs        : 10 !default;
+$fa-size-scale-xs         : 12 !default;
+$fa-size-scale-sm         : 14 !default;
+$fa-size-scale-base       : 16 !default;
+$fa-size-scale-lg         : 20 !default;
+$fa-size-scale-xl         : 24 !default;
+$fa-size-scale-2xl        : 32 !default;
 
 $fa-sizes: (
-  "2xs"                 : $fa-size-scale-2xs,
-  "xs"                  : $fa-size-scale-xs,
-  "sm"                  : $fa-size-scale-sm,
-  "lg"                  : $fa-size-scale-lg,
-  "xl"                  : $fa-size-scale-xl,
-  "2xl"                 : $fa-size-scale-2xl
+  "2xs"                   : $fa-size-scale-2xs,
+  "xs"                    : $fa-size-scale-xs,
+  "sm"                    : $fa-size-scale-sm,
+  "lg"                    : $fa-size-scale-lg,
+  "xl"                    : $fa-size-scale-xl,
+  "2xl"                   : $fa-size-scale-2xl
 ) !default;
 
-$fa-li-width            : 2em !default;
-$fa-li-margin           : $fa-li-width * fa-divide(5, 4) !default;
+$fa-li-width              : 2em !default;
+$fa-li-margin             : $fa-li-width * fa-divide(5, 4) !default;
 
-$fa-pull-margin         : .3em !default;
+$fa-pull-margin           : .3em !default;
 
-$fa-primary-opacity     : 1 !default;
-$fa-secondary-opacity   : .4 !default;
+$fa-primary-opacity       : 1 !default;
+$fa-secondary-opacity     : .4 !default;
 
-$fa-stack-vertical-align: middle !default;
-$fa-stack-width         : ($fa-fw-width * 2) !default;
-$fa-stack-z-index       : auto !default;
+$fa-stack-vertical-align  : middle !default;
+$fa-stack-width           : ($fa-fw-width * 2) !default;
+$fa-stack-z-index         : auto !default;
 
-$fa-font-display        : block !default;
-$fa-font-path           : "../webfonts" !default;
+$fa-font-display          : block !default;
+$fa-font-path             : "../webfonts" !default;
 
 $fa-var-0: \30;
 $fa-var-00: \e467;
@@ -780,6 +783,8 @@ $fa-var-caret-down: \f0d7;
 $fa-var-caret-left: \f0d9;
 $fa-var-caret-right: \f0da;
 $fa-var-caret-up: \f0d8;
+$fa-var-carpool: \e69c;
+$fa-var-car-people: \e69c;
 $fa-var-carrot: \f787;
 $fa-var-cars: \f85b;
 $fa-var-cart-arrow-down: \f218;
@@ -835,6 +840,8 @@ $fa-var-bar-chart: \f080;
 $fa-var-chart-bullet: \e0e1;
 $fa-var-chart-candlestick: \e0e2;
 $fa-var-chart-column: \e0e3;
+$fa-var-chart-diagram: \e695;
+$fa-var-chart-fft: \e69e;
 $fa-var-chart-gantt: \e0e4;
 $fa-var-chart-kanban: \e64f;
 $fa-var-chart-line: \f201;
@@ -860,6 +867,7 @@ $fa-var-chart-scatter-3d: \e0e8;
 $fa-var-chart-scatter-bubble: \e0e9;
 $fa-var-chart-simple: \e473;
 $fa-var-chart-simple-horizontal: \e474;
+$fa-var-chart-sine: \e69d;
 $fa-var-chart-tree-map: \e0ea;
 $fa-var-chart-user: \f6a3;
 $fa-var-user-chart: \f6a3;
@@ -1093,6 +1101,8 @@ $fa-var-circle-y: \e12f;
 $fa-var-circle-yen: \e5d0;
 $fa-var-circle-z: \e130;
 $fa-var-circles-overlap: \e600;
+$fa-var-circles-overlap-3: \e6a1;
+$fa-var-pronoun: \e6a1;
 $fa-var-citrus: \e2f4;
 $fa-var-citrus-slice: \e2f5;
 $fa-var-city: \f64f;
@@ -1231,6 +1241,7 @@ $fa-var-comment-middle: \e149;
 $fa-var-comment-middle-top: \e14a;
 $fa-var-comment-minus: \f4b1;
 $fa-var-comment-music: \f8b0;
+$fa-var-comment-nodes: \e696;
 $fa-var-comment-pen: \f4ae;
 $fa-var-comment-edit: \f4ae;
 $fa-var-comment-plus: \f4b2;
@@ -1728,7 +1739,9 @@ $fa-var-file-excel: \f1c3;
 $fa-var-file-exclamation: \f31a;
 $fa-var-file-export: \f56e;
 $fa-var-arrow-right-from-file: \f56e;
+$fa-var-file-fragment: \e697;
 $fa-var-file-gif: \e645;
+$fa-var-file-half-dashed: \e698;
 $fa-var-file-heart: \e176;
 $fa-var-file-image: \f1c5;
 $fa-var-file-import: \f56f;
@@ -2165,6 +2178,8 @@ $fa-var-hexagon-exclamation: \e417;
 $fa-var-hexagon-image: \e504;
 $fa-var-hexagon-minus: \f307;
 $fa-var-minus-hexagon: \f307;
+$fa-var-hexagon-nodes: \e699;
+$fa-var-hexagon-nodes-bolt: \e69a;
 $fa-var-hexagon-plus: \f300;
 $fa-var-plus-hexagon: \f300;
 $fa-var-hexagon-vertical-nft: \e505;
@@ -3526,6 +3541,7 @@ $fa-var-square-arrow-up-left: \e263;
 $fa-var-square-arrow-up-right: \f14c;
 $fa-var-external-link-square: \f14c;
 $fa-var-square-b: \e264;
+$fa-var-square-binary: \e69b;
 $fa-var-square-bolt: \e265;
 $fa-var-square-c: \e266;
 $fa-var-square-caret-down: \f150;
@@ -5077,6 +5093,8 @@ $fa-icons: (
   "caret-left": $fa-var-caret-left,
   "caret-right": $fa-var-caret-right,
   "caret-up": $fa-var-caret-up,
+  "carpool": $fa-var-carpool,
+  "car-people": $fa-var-car-people,
   "carrot": $fa-var-carrot,
   "cars": $fa-var-cars,
   "cart-arrow-down": $fa-var-cart-arrow-down,
@@ -5132,6 +5150,8 @@ $fa-icons: (
   "chart-bullet": $fa-var-chart-bullet,
   "chart-candlestick": $fa-var-chart-candlestick,
   "chart-column": $fa-var-chart-column,
+  "chart-diagram": $fa-var-chart-diagram,
+  "chart-fft": $fa-var-chart-fft,
   "chart-gantt": $fa-var-chart-gantt,
   "chart-kanban": $fa-var-chart-kanban,
   "chart-line": $fa-var-chart-line,
@@ -5157,6 +5177,7 @@ $fa-icons: (
   "chart-scatter-bubble": $fa-var-chart-scatter-bubble,
   "chart-simple": $fa-var-chart-simple,
   "chart-simple-horizontal": $fa-var-chart-simple-horizontal,
+  "chart-sine": $fa-var-chart-sine,
   "chart-tree-map": $fa-var-chart-tree-map,
   "chart-user": $fa-var-chart-user,
   "user-chart": $fa-var-user-chart,
@@ -5390,6 +5411,8 @@ $fa-icons: (
   "circle-yen": $fa-var-circle-yen,
   "circle-z": $fa-var-circle-z,
   "circles-overlap": $fa-var-circles-overlap,
+  "circles-overlap-3": $fa-var-circles-overlap-3,
+  "pronoun": $fa-var-pronoun,
   "citrus": $fa-var-citrus,
   "citrus-slice": $fa-var-citrus-slice,
   "city": $fa-var-city,
@@ -5528,6 +5551,7 @@ $fa-icons: (
   "comment-middle-top": $fa-var-comment-middle-top,
   "comment-minus": $fa-var-comment-minus,
   "comment-music": $fa-var-comment-music,
+  "comment-nodes": $fa-var-comment-nodes,
   "comment-pen": $fa-var-comment-pen,
   "comment-edit": $fa-var-comment-edit,
   "comment-plus": $fa-var-comment-plus,
@@ -6025,7 +6049,9 @@ $fa-icons: (
   "file-exclamation": $fa-var-file-exclamation,
   "file-export": $fa-var-file-export,
   "arrow-right-from-file": $fa-var-arrow-right-from-file,
+  "file-fragment": $fa-var-file-fragment,
   "file-gif": $fa-var-file-gif,
+  "file-half-dashed": $fa-var-file-half-dashed,
   "file-heart": $fa-var-file-heart,
   "file-image": $fa-var-file-image,
   "file-import": $fa-var-file-import,
@@ -6462,6 +6488,8 @@ $fa-icons: (
   "hexagon-image": $fa-var-hexagon-image,
   "hexagon-minus": $fa-var-hexagon-minus,
   "minus-hexagon": $fa-var-minus-hexagon,
+  "hexagon-nodes": $fa-var-hexagon-nodes,
+  "hexagon-nodes-bolt": $fa-var-hexagon-nodes-bolt,
   "hexagon-plus": $fa-var-hexagon-plus,
   "plus-hexagon": $fa-var-plus-hexagon,
   "hexagon-vertical-nft": $fa-var-hexagon-vertical-nft,
@@ -7823,6 +7851,7 @@ $fa-icons: (
   "square-arrow-up-right": $fa-var-square-arrow-up-right,
   "external-link-square": $fa-var-external-link-square,
   "square-b": $fa-var-square-b,
+  "square-binary": $fa-var-square-binary,
   "square-bolt": $fa-var-square-bolt,
   "square-c": $fa-var-square-c,
   "square-caret-down": $fa-var-square-caret-down,

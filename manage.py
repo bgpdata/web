@@ -1,59 +1,153 @@
 #!/usr/bin/env python
-import click
 import sys
 import os
+import glob
+import subprocess
+import argparse
 import asyncio
-from flask.cli import FlaskGroup
-from alembic.config import Config
-from alembic import command
+from pathlib import Path
+from config import Config
 
 # Ensure the root directory is in sys.path
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-def create_my_app():
-    """FlaskGroup needs this function to create the app."""
-    from app import create_app
-    return create_app()
+# Validate the configuration
+Config.validate()
 
-@click.group(cls=FlaskGroup, create_app=create_my_app)
-def cli():
-    """BGPDATA Management Script."""
-    pass
+def migrate():
+    """
+    Runs the database migrations.
+    """
 
-@cli.command("run")
-@click.option("--workers", default="1", help="Number of workers to run with Gunicorn")
-@click.option("--host", default="localhost", help="Host to run the application on")
-@click.option("--port", default=8080, help="Port to run the application on")
-def run(workers, host, port):
+    # Get migration files
+    path = Path(f"./migrations/{Config.COUNTRY}")
+    files = sorted(glob.glob(
+        str(path / "*.py")
+    ))
+
+    if not files:
+        raise ValueError(f"No migration files found in {path}")
+
+    # Execute each migration file
+    for file in files:
+        filename = Path(file).name
+        ok_path = Path(f"/var/log/migrations/{filename}.ok")
+        error_path = Path(f"/var/log/migrations/{filename}.error")
+
+        if ok_path.exists():
+            continue
+
+        if error_path.exists():
+            print(f"WARNING: Migration '{file}' failed previously.")
+            continue
+
+        print(f"Migrating {file}...")
+
+        try:
+            # Execute file
+            result = subprocess.run([
+                "python",
+                file
+            ], capture_output=True, text=True, check=True, env={
+                **os.environ,
+                "PYTHONPATH": os.path.abspath(os.path.dirname(__file__))
+            })
+            
+            # Print any output from the script
+            if result.stdout:
+                print(result.stdout.strip())
+
+            print(f"done.")
+            
+            # Write .ok file
+            with open(ok_path, 'w') as f:
+                f.write(file)
+                
+        except subprocess.CalledProcessError as e:
+            error_msg = f"Error: {e.stderr.strip()}"
+            print(error_msg)
+
+            # Write .error file
+            with open(error_path, 'w') as f:
+                f.write(error_msg)
+            
+            print(f"failed.")
+            return
+        except Exception as e:
+            error_msg = str(e)
+            print(f"Error: {error_msg}")
+
+            # Write .error file
+            with open(error_path, 'w') as f:
+                f.write(error_msg)
+            
+            print(f"failed.")
+            return
+
+def relay():
+    """
+    Runs the relay.
+    """
+
+    import relay.main as module
+    asyncio.run(module.main())
+
+def run(workers="1", host="localhost", port=8080, reload=False):
     """
     Runs the application.
     """
-    import subprocess
-    subprocess.run([
-        "gunicorn", 
-        "--bind", f"{host}:{port}", 
-        "--workers", workers,
-        "--worker-class", "uvicorn.workers.UvicornWorker",
-        "app:asgi_app"
-    ])
-    
 
-@cli.command("collector")
-def collector():
+    if reload:
+        subprocess.run([
+            "gunicorn", 
+            "--bind", f"{host}:{port}", 
+            "--workers", workers,
+            "--worker-class", "uvicorn.workers.UvicornWorker",
+            "--env", "GUNICORN_WORKER_ID=${GUNICORN_WORKER_ID:-0}",
+            "--reload",
+            "app:asgi_app"
+        ])
+    else:
+        subprocess.run([
+            "gunicorn", 
+            "--bind", f"{host}:{port}", 
+            "--workers", workers,
+            "--worker-class", "uvicorn.workers.UvicornWorker",
+            "--env", "GUNICORN_WORKER_ID=${GUNICORN_WORKER_ID:-0}",
+            "app:asgi_app"
+        ])
+
+def main():
     """
-    Runs the collector.
+    Main function to parse arguments and run the appropriate command.
     """
 
-    import collector.main as module
-    asyncio.run(module.main())
+    parser = argparse.ArgumentParser(description='Flask Management Script')
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
-@cli.command("migrate")
-def migrate():
-    """
-    Runs database migrations.
-    """
-    alembic_cfg = Config("alembic.ini")
-    command.upgrade(alembic_cfg, "head")
+    # Migrate command
+    subparsers.add_parser('migrate', help='Run database migrations')
+
+    # Run command
+    run_parser = subparsers.add_parser('run', help='Run the application')
+    run_parser.add_argument('--workers', default='1', help='Number of workers to run with Gunicorn')
+    run_parser.add_argument('--host', default='localhost', help='Host to run the application on')
+    run_parser.add_argument('--port', type=int, default=8080, help='Port to run the application on')
+    run_parser.add_argument('--reload', action='store_true', help='Run with development server')
+
+    args = parser.parse_args()
+
+    if args.command == 'migrate':
+        print("Applying migrations...")
+        migrate()
+    elif args.command == 'relay':
+        print("Starting relay...")
+        relay()
+    elif args.command == 'run':
+        print("Starting server...")
+        run(args.workers, args.host, args.port, args.reload)
+    else:
+        parser.print_help()
 
 if __name__ == "__main__":
-    cli()
+    main()

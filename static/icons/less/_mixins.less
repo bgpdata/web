@@ -43,119 +43,53 @@
 
 // sets a specific icon family to use alongside style + icon mixins
 .fa-family-classic() {
-  font-family: 'Font Awesome 6 Pro';
+  &:extend(.fa-classic all);
 }
-
+.fa-family-duotone() {
+  &:extend(.fa-duotone all);
+}
 .fa-family-sharp() {
-  font-family: 'Font Awesome 6 Sharp';
+  &:extend(.fa-sharp all);
 }
-
 .fa-family-sharp-duotone() {
-  font-family: 'Font Awesome 6 Sharp Duotone';
+  &:extend(.fa-sharp-duotone all);
 }
 
 // convenience mixins for declaring pseudo-elements by CSS variable,
-// including all style-specific font properties, and both the ::before
-// and ::after elements in the duotone case.
+// including all style-specific font properties
 .fa-icon-solid(@fa-var) {
-  .fa-icon;
-  .fa-solid;
+  &:extend(.fa-solid all);
 
-  &::before {
-    content: @fa-var;
-  }
+  & { @{fa-icon-property}: @fa-var; @{fa-duotone-icon-property}: %("%s%s", @fa-var, @fa-var); }
 }
 
 .fa-icon-regular(@fa-var) {
-  .fa-icon;
-  .fa-regular;
+  &:extend(.fa-regular all);
 
-  &::before {
-    content: @fa-var;
-  }
+  & { @{fa-icon-property}: @fa-var; @{fa-duotone-icon-property}: %("%s%s", @fa-var, @fa-var); }
 }
 
 .fa-icon-light(@fa-var) {
-  .fa-icon;
-  .fa-light;
+  &:extend(.fa-light all);
 
-  &::before {
-    content: @fa-var;
-  }
+  & { @{fa-icon-property}: @fa-var; @{fa-duotone-icon-property}: %("%s%s", @fa-var, @fa-var); }
 }
 
 .fa-icon-thin(@fa-var) {
-  .fa-icon;
-  .fa-thin;
+  &:extend(.fa-thin all);
 
-  &::before {
-    content: @fa-var;
-  }
+  & { @{fa-icon-property}: @fa-var; @{fa-duotone-icon-property}: %("%s%s", @fa-var, @fa-var); }
 }
 
 .fa-icon-duotone(@fa-var) {
-  .fa-icon;
-  &:extend(.fa-duotone all); // extends all pseudo-element selectors/rules inside of .fa-duotone
+  &:extend(.fa-duotone all);
 
-  &::before {
-    content: @fa-var;
-  }
-  &::after {
-    content: %("%s%s", @fa-var, @fa-var);
-  }
-}
-
-.fa-icon-sharp-solid(@fa-var) {
-  .fa-icon;
-  .fa-sharp-solid;
-
-  &::before {
-    content: @fa-var;
-  }
-}
-
-.fa-icon-sharp-regular(@fa-var) {
-  .fa-icon;
-  .fa-sharp-regular;
-
-  &::before {
-    content: @fa-var;
-  }
-}
-
-.fa-icon-sharp-light(@fa-var) {
-  .fa-icon;
-  .fa-sharp-light;
-
-  &::before {
-    content: @fa-var;
-  }
-}
-
-.fa-icon-sharp-thin(@fa-var) {
-  .fa-icon;
-  .fa-sharp-thin;
-
-  &::before {
-    content: @fa-var;
-  }
-}
-
-.fa-icon-sharp-duotone-solid(@fa-var) {
-  .fa-icon;
-  .fa-sharp-duotone-solid;
-
-  &::before {
-    content: @fa-var;
-  }
+  & { @{fa-icon-property}: @fa-var; @{fa-duotone-icon-property}: %("%s%s", @fa-var, @fa-var); }
 }
 
 .fa-icon-brands(@fa-var) {
-  .fa-icon;
-  .fa-brands;
+  &:extend(.fa-brands all);
 
-  &::before {
-    content: @fa-var;
-  }
+  & { @{fa-icon-property}: @fa-var; @{fa-duotone-icon-property}: %("%s%s", @fa-var, @fa-var); }
 }
 
