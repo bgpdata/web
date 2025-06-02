@@ -88,7 +88,6 @@ def create_app():
         with open(css_file, 'w', -1, 'utf8') as f:
             f.write(sass.compile(filename=scss_file))
 
-
     # Compile SCSS once on startup
     compile_scss()
 

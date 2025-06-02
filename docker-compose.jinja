@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 ####
 # BGPDATA - BGP Data Collection and Analytics Service
 # 
@@ -82,7 +82,9 @@ services:
                 condition: service_healthy
         working_dir: /app
         volumes:
+            {%- if not production %}
             - .:/app
+            {%- endif %}
         entrypoint: >
             /bin/sh -c "python manage.py migrate && python manage.py run --host 0.0.0.0"
 
@@ -133,7 +135,9 @@ services:
                 condition: service_healthy
         working_dir: /app
         volumes:
+            {%- if not production %}
             - .:/app
+            {%- endif %}
             - core_{{ host | replace(".", "_") | replace("-", "_") }}_data:/var/lib/rocksdb
         entrypoint: >
             python manage.py collector
@@ -165,7 +169,9 @@ services:
                 condition: service_healthy
         working_dir: /app
         volumes:
+            {%- if not production %}
             - .:/app
+            {%- endif %}
             - core_{{ host | replace(".", "_") | replace("-", "_") }}_data:/var/lib/rocksdb
         entrypoint: >
             python manage.py collector
@@ -388,8 +394,10 @@ services:
         ports:
             - "3000:3000"
         volumes:
+            {%- if not production %}
             - ./grafana:/var/lib/grafana
             - ./grafana/provisioning/:/etc/grafana/provisioning/
+            {%- endif %}
         environment:
             GF_SECURITY_ADMIN_PASSWORD: openbmp
             GF_AUTH_ANONYMOUS_ENABLED: true

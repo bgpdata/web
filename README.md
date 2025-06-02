@@ -71,20 +71,20 @@ As well as a Grafana dashboard at [`http://localhost:3000`](http://localhost:300
 
 For production deployment, we recommend using Docker Swarm.
 
-1. Configure Secrets:
+1. **Setup Secrets:**
 ```sh
-# Postmark API Key
-# https://postmarkapp.com/support/article/1008-what-are-the-account-and-server-api-tokens
 echo "YOUR_POSTMARK_API_KEY" | docker secret create postmark_api_key -
-
-# Flask Secret Key
-# https://flask.palletsprojects.com/en/2.3.x/config/#SECRET_KEY
 echo "YOUR_FLASK_SECRET_KEY" | docker secret create flask_secret_key -
 ```
 
-2. Deploy the Stack:
+2. **Specify the node affinity:**
 ```sh
-curl -L https://downloads.bgp-data.net/docker-compose.yml | docker stack deploy -c - bgpdata
+docker node update --label-add bgpdata-node=true <NODE_ID>
+```
+
+2. **Deploy the Stack:**
+```sh
+curl -fsSL https://downloads.bgp-data.net/docker-compose.yml | docker stack deploy -c - bgpdata
 ```
 
 # ACKs
