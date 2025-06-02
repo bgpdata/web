@@ -27,9 +27,10 @@ static/styles/*.css
 # RocksDB
 .rocksdb/
 
-# =========================
+# Environment
+.env
+
 # Operating System Files
-# =========================
 
 .DS_Store
 .idea

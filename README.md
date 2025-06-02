@@ -25,65 +25,39 @@ Before you begin, ensure you have the following installed on your system:
 
 ## Getting Started
 
-Follow these instructions to get the project up and running on your local machine.
-
-### Clone the Repository
-
-First, clone the repository to your local machine:
-
-```sh
+1. Clone the repository:
+```bash
 git clone git@github.com:bgpdata/bgpdata.git
 cd bgpdata
 ```
 
-### Project Structure
+2. Define a `.env` file:
+```
+FLASK_HOST=https://bgp-data.net
+POSTMARK_API_KEY=your-postmark-api-key
+CLOUDFLARE_TUNNEL_TOKEN=your-cloudflare-tunnel-token
+GRAFANA_ADMIN_PASSWORD=your-grafana-admin-password
+SECRET_KEY=your-flask-secret-key
+```
 
-The project directory contains the following files:
-
--   `Dockerfile`: Dockerfile for building the application image.
--   `docker-compose.tpl`: Docker Compose template file with Jinja2 templating.
--   `requirements.txt`: List of Python dependencies for the application.
--   `manage.py`: The application entrypoint.
--   `values.yaml`: Values file for the Docker Compose template.
-
-### Build and Start the Services
-
-To build and start BGPDATA, run the following command in the project directory:
-
+3. Start the service:
 ```sh
 jinja2 docker-compose.jinja values.yaml | docker-compose up -f- "$@" -d
 ```
 
-This command will:
+> **Note:** This will start collecting from all RouteViews and RIS Collectors. You can further specify to collect from only a specific subset of collector hosts by modifying the `values.yaml` file`.
 
-1. Build the Docker image for the various services.
-2. Start the services and initialize the Databases.
-3. Serve a user interface at [`http://localhost:8080`](http://localhost:8080)
-4. And begin the data collection process from [Route Views](https://www.routeviews.org/) and [RIPE NCC RIS](https://ris.ripe.net/) collectors.
-
-### Accessing the Application
-
-Once the services are up and running, you can access the user interface at [`http://localhost:8080`](http://localhost:8080).
-We also provide a REST API at [`http://localhost:8080/api/v1/`](http://localhost:8080/api/v1/) for programmatic access to the data (coming soon).
-As well as a Grafana dashboard at [`http://localhost:3000`](http://localhost:3000) to visualize the data and performance metrics (internal only).
+4. Open:
+http://localhost:8080 (Web)
+http://localhost:3000 (Grafana)
 
 ### Production Deployment
 
-For production deployment, we recommend using Docker Swarm.
+For production deployment, we use Docker Swarm, but any other orchestration tool may be used.
+The recommended system requirements are a minimum of 32 GB of RAM and 48 vCPU cores.
 
-1. **Setup Secrets:**
 ```sh
-echo "YOUR_POSTMARK_API_KEY" | docker secret create postmark_api_key -
-echo "YOUR_FLASK_SECRET_KEY" | docker secret create flask_secret_key -
-```
-
-2. **Specify the node affinity:**
-```sh
-docker node update --label-add bgpdata-node=true <NODE_ID>
-```
-
-2. **Deploy the Stack:**
-```sh
+# Create an .env file as above, then:
 curl -fsSL https://downloads.bgp-data.net/docker-compose.yml | docker stack deploy -c - bgpdata
 ```
 
