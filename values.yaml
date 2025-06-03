@@ -3,15 +3,15 @@ production: false
 # https://ris.ripe.net/docs/route-collectors/
 ris:
   - rrc00 # Amsterdam, RIPE NCC, global
-#  - rrc01 # London, LINX/LONAP, regional
-#  - rrc03 # Amsterdam, AMS-IX/NL-IX, regional
-#  - rrc04 # Geneva, CERN, regional
-#  - rrc05 # Vienna, VIX, regional
-#  - rrc06 # Otemachi, RIPE NCC, regional
-#  - rrc07 # Stockholm, Netnod, regional
-#  - rrc10 # Milan, MIX, regional
-#  - rrc11 # New York, Telehouse/GTT, regional
-#  - rrc12 # Frankfurt, DE-CIX, regional
+  - rrc01 # London, LINX/LONAP, regional
+  - rrc03 # Amsterdam, AMS-IX/NL-IX, regional
+  - rrc04 # Geneva, CERN, regional
+  - rrc05 # Vienna, VIX, regional
+  - rrc06 # Otemachi, RIPE NCC, regional
+  - rrc07 # Stockholm, Netnod, regional
+  - rrc10 # Milan, MIX, regional
+  - rrc11 # New York, Telehouse/GTT, regional
+  - rrc12 # Frankfurt, DE-CIX, regional
 #  - rrc13 # Moscow, MSK-IX, regional
 #  - rrc14 # Palo Alto, Equinix, regional
 #  - rrc15 # Sao Paulo, IX.br, regional
@@ -30,15 +30,15 @@ ris:
 # https://www.routeviews.org/
 routeviews:
   - amsix.ams
-#  - route-views.amsix
-#  - route-views.bknix
-#  - route-views.chicago
-#  - route-views.chile
-#  - cix.atl
-#  - decix.jhb
-#  - route-views.eqix
-#  - route-views.flix
-#  - route-views.fortaleza
+  - route-views.amsix
+  - route-views.bknix
+  - route-views.chicago
+  - route-views.chile
+  - cix.atl
+  - decix.jhb
+  - route-views.eqix
+  - route-views.flix
+  - route-views.fortaleza
 #  - route-views.gorex
 #  - route-views.isc
 #  - route-views.kixp
