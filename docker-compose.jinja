@@ -282,11 +282,6 @@ services:
             placement:
                 constraints:
                     - node.role == manager
-        healthcheck:
-            test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "kafka:29092"]
-            interval: 30s
-            timeout: 60s # Command may take some time.
-            retries: 10
         depends_on:
             - zookeeper
         volumes:
