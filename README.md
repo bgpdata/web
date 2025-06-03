@@ -36,7 +36,6 @@ cd bgpdata
 FLASK_HOST=https://bgp-data.net
 POSTMARK_API_KEY=your-postmark-api-key
 CLOUDFLARE_TUNNEL_TOKEN=your-cloudflare-tunnel-token
-GRAFANA_ADMIN_PASSWORD=your-grafana-admin-password
 SECRET_KEY=your-flask-secret-key
 ```
 

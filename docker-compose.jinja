@@ -35,7 +35,7 @@ services:
         
     web:
         {%- if production %}
-        image: bgpdata/bgpdata:0.1.6
+        image: bgpdata/bgpdata:0.1.7
         {%- else %}
         build: .
         {%- endif %}
@@ -87,7 +87,7 @@ services:
     {%- for host in ris %}
     relay-{{ host | replace(".", "-") }}:
         {%- if production %}
-        image: bgpdata/bgpdata:0.1.6
+        image: bgpdata/bgpdata:0.1.7
         {%- else %}
         build: .
         {%- endif %}
@@ -118,7 +118,7 @@ services:
     {%- for host in routeviews %}
     relay-{{ host | replace(".", "-") }}:
         {%- if production %}
-        image: bgpdata/bgpdata:0.1.6
+        image: bgpdata/bgpdata:0.1.7
         {%- else %}
         build: .
         {%- endif %}
@@ -310,6 +310,7 @@ services:
             KAFKA_MESSAGE_MAX_BYTES: 100000000
             KAFKA_LOG_CLEANER_THREADS: 2
 
+    {%- if not production %}
     grafana:
         image: grafana/grafana:9.1.7
         restart: unless-stopped
@@ -328,14 +329,13 @@ services:
         ports:
             - "3000:3000"
         volumes:
-            {%- if not production %}
             - ./grafana:/var/lib/grafana
             - ./grafana/provisioning/:/etc/grafana/provisioning/
-            {%- endif %}
         environment:
-            GF_SECURITY_ADMIN_PASSWORD: {% raw %}${GRAFANA_ADMIN_PASSWORD:-grafana}{% endraw %}
+            GF_SECURITY_ADMIN_PASSWORD: openbmp
             GF_USERS_HOME_PAGE: d/obmp-home/obmp-home
             GF_INSTALL_PLUGINS: agenty-flowcharting-panel,grafana-piechart-panel,grafana-worldmap-panel,grafana-simple-json-datasource,vonage-status-panel
+    {%- endif %}
 
     {%- if production %}
     cloudflared:
