@@ -35,7 +35,7 @@ services:
         
     web:
         {%- if production %}
-        image: bgpdata/bgpdata:0.1.4
+        image: bgpdata/bgpdata:0.1.5
         {%- else %}
         build: .
         {%- endif %}
@@ -71,8 +71,7 @@ services:
             ENVIRONMENT: development
             {%- endif %}
         depends_on:
-            postgres:
-                condition: service_healthy
+            - postgres
         volumes:
             {%- if not production %}
             - .:/app
@@ -87,7 +86,7 @@ services:
     {%- for host in ris %}
     relay-{{ host | replace(".", "-") }}:
         {%- if production %}
-        image: bgpdata/bgpdata:{{ version | default('latest') }}
+        image: bgpdata/bgpdata:0.1.5
         {%- else %}
         build: .
         {%- endif %}
@@ -105,8 +104,7 @@ services:
             KAFKA_CONNECT: stream.ris-kafka.com:9092
             OPENBMP_CONNECT: collector-{{ host | replace(".", "-") }}:5000
         depends_on:
-            collector-{{ host | replace(".", "-") }}:
-                condition: service_healthy
+            - collector-{{ host | replace(".", "-") }}
         volumes:
             {%- if not production %}
             - .:/app
@@ -119,7 +117,7 @@ services:
     {%- for host in routeviews %}
     relay-{{ host | replace(".", "-") }}:
         {%- if production %}
-        image: bgpdata/bgpdata:{{ version | default('latest') }}
+        image: bgpdata/bgpdata:0.1.5
         {%- else %}
         build: .
         {%- endif %}
@@ -137,8 +135,7 @@ services:
             KAFKA_CONNECT: stream.routeviews.org:9092
             OPENBMP_CONNECT: collector-{{ host | replace(".", "-") }}:5000
         depends_on:
-            collector-{{ host | replace(".", "-") }}:
-                condition: service_healthy
+            - collector-{{ host | replace(".", "-") }}
         volumes:
             {%- if not production %}
             - .:/app
@@ -162,10 +159,8 @@ services:
                 constraints:
                     - node.role == worker
         depends_on:
-            postgres:
-                condition: service_healthy
-            kafka:
-                condition: service_healthy
+            - postgres
+            - kafka
         volumes:
             - openbmp_data:/config
         environment:
@@ -214,12 +209,9 @@ services:
             interval: 30s
             timeout: 10s
             retries: 3
-        
         depends_on:
-            postgres:
-                condition: service_healthy
-            kafka:
-                condition: service_healthy
+            - postgres
+            - kafka
         sysctls:
             - net.ipv4.tcp_keepalive_intvl=30
             - net.ipv4.tcp_keepalive_probes=5
@@ -251,8 +243,7 @@ services:
         volumes:
             - openbmp_data:/config
         depends_on:
-            postgres:
-                condition: service_healthy
+            - postgres
         ports:
             - "4300:43"
         environment:
@@ -297,8 +288,7 @@ services:
             timeout: 60s # Command may take some time.
             retries: 10
         depends_on:
-            zookeeper:
-                condition: service_healthy
+            - zookeeper
         volumes:
             - kafka_data:/var/lib/kafka/data
         environment:
