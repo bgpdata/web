@@ -1,33 +1,4 @@
 .content__as {
-    .as__hero {
-        background-color: #262626;
-
-        .hero__container {
-            margin-left: 12.5%;
-            display: block;
-            max-width: 72%;
-            flex: 0 0 72%;
-            padding: 3rem 0;
-            width: 100%;
-
-            .container__heading {
-                font-weight: 100;
-                font-size: 3rem;
-                line-height: 1.125;
-                color: #fff;
-                margin-top: 0;
-                margin-bottom: 1rem;
-            }
-
-            .container__asn {
-                font-weight: 100;
-                font-size: 2rem;
-                line-height: 1.5;
-                color: #c6c6c6;
-            }
-        }
-    }
-
     .as__content {
         display: flex;
         width: 100%;

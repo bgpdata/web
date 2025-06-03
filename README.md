@@ -42,7 +42,7 @@ SECRET_KEY=your-flask-secret-key
 
 3. Start the service:
 ```sh
-jinja2 docker-compose.jinja values.yaml | docker-compose up -f- "$@" -d
+jinja2 docker-compose.jinja values.yaml | docker compose -f - up
 ```
 
 > **Note:** This will start collecting from all RouteViews and RIS Collectors. You can further specify to collect from only a specific subset of collector hosts by modifying the `values.yaml` file`.

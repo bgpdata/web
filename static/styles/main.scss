@@ -1,7 +1,6 @@
 /* Base */
 @import "./base/_mixins";
 @import "./base/_variables";
-@import "./base/_typography";
 
 /* Components */
 @import "./components/_searchbar";
@@ -9,14 +8,13 @@
 /* Layout */
 @import "./layout/_footer";
 @import "./layout/_header";
-@import "./layout/_notice";
 @import "./layout/_navigation";
 @import "./layout/_backdrop";
 @import "./layout/_notification";
 
 /* Pages */
 @import "./pages/_index";
-@import "./pages/_as";
+@import "./pages/_asn";
 
 * {
     box-sizing: border-box;
@@ -24,7 +22,11 @@
 
 html,
 body {
-    font-family: "Public Sans", Helvetica, Verdana, sans-serif;
+    font-family: 
+        IBM Plex Sans,
+        Helvetica Neue,
+        Arial,
+        sans-serif;
     background: #ffffff;
     font-size: 16px; // For 1rem
     color: #161616;

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, abort, session, current_app as app, jsonify
 from utils.text import time_ago, format_text, clean_text, alphanumeric_text, clean_text, sanitize_text, date_text
 from flask_compress import Compress
+from config import MainConfig as Config
 from flask_cors import CORS
 from flask_talisman import Talisman
 from asgiref.wsgi import WsgiToAsgi
@@ -9,14 +10,12 @@ from utils.cache import cache, caching
 from utils.limiter import limiter
 from utils.jobs import example_job
 from utils.seo import get_sitemap
-from routes.as import as_blueprint
+from routes.asn import asn_blueprint
 from datetime import timedelta
 from logging import StreamHandler
-from config import Config
 import logging
 import atexit
 import sass # type: ignore
-import pytz
 import sys
 import re
 
@@ -209,10 +208,10 @@ def create_app():
 
 
     @app.route('/')
-    @caching(timeout=86400) # 24 hours
+    #@caching(timeout=86400) # 24 hours
     def index():
         try:
-            example = "Example"
+            example = "Example5"
 
         except Exception as e:
             app.logger.error("Failed to load index: %s", str(e), exc_info=True)
@@ -222,7 +221,7 @@ def create_app():
 
 
     # Register Blueprints
-    app.register_blueprint(as_blueprint, url_prefix='/as')
+    app.register_blueprint(asn_blueprint, url_prefix='/asn')
 
     return app
 

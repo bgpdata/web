@@ -7,6 +7,7 @@ from relay.src.rib import rib_task
 from relay.src.sender import sender_task
 from relay.src.logging import logging_task
 from concurrent.futures import ThreadPoolExecutor
+from config import RelayConfig as Config
 from libs.bmp import BMPv3
 import queue as queueio
 import rocksdbpy
@@ -18,13 +19,8 @@ import os
 
 # Logger
 logger = logging.getLogger(__name__)
-log_level = os.getenv('RELAY_LOG_LEVEL', 'INFO').upper()
+log_level = Config.LOG_LEVEL
 logger.setLevel(getattr(logging, log_level, logging.INFO))
-
-# Environment variables
-OPENBMP_CONNECT = os.getenv('RELAY_OPENBMP_CONNECT')
-KAFKA_CONNECT = os.getenv('RELAY_KAFKA_CONNECT')
-HOST = os.getenv('RELAY_HOST')
 
 # Signal handler
 def handle_shutdown(signum, frame, event):
@@ -79,22 +75,22 @@ async def main():
 
         # Initialize the BMP connection
         message = BMPv3.init_message(
-            router_name=f'{HOST}.ripe.net' if HOST.startswith('rrc') else HOST,
-            router_descr=f'{HOST}.ripe.net' if HOST.startswith('rrc') else f'{HOST}.routeviews.org'
+            router_name=f'{Config.HOST}.ripe.net' if Config.HOST.startswith('rrc') else Config.HOST,
+            router_descr=f'{Config.HOST}.ripe.net' if Config.HOST.startswith('rrc') else f'{Config.HOST}.routeviews.org'
         )
         queue.put((message, 0, None, -1, False))
 
         # Start rib task
-        loop.run_in_executor(executor, rib_task, HOST, queue, db, logger, events, memory)
+        loop.run_in_executor(executor, rib_task, Config.HOST, queue, db, logger, events, memory)
 
         # Start kafka task
-        loop.run_in_executor(executor, kafka_task, HOST, KAFKA_CONNECT, queue, db, logger, events, memory)
+        loop.run_in_executor(executor, kafka_task, Config.HOST, Config.KAFKA_CONNECT, queue, db, logger, events, memory)
 
         # Start sender task
-        loop.run_in_executor(executor, sender_task, OPENBMP_CONNECT, queue, db, logger, events, memory)
+        loop.run_in_executor(executor, sender_task, Config.OPENBMP_CONNECT, queue, db, logger, events, memory)
 
         # Start logging task
-        loop.run_in_executor(executor, logging_task, HOST, queue, logger, events, memory)
+        loop.run_in_executor(executor, logging_task, Config.HOST, queue, logger, events, memory)
 
         # Wait for the shutdown event
         events['shutdown'].wait()

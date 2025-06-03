@@ -6,13 +6,10 @@ import subprocess
 import argparse
 import asyncio
 from pathlib import Path
-from config import Config
+from config import MainConfig, RelayConfig
 
 # Ensure the root directory is in sys.path
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
-
-# Validate the configuration
-Config.validate()
 
 def migrate():
     """
@@ -20,13 +17,17 @@ def migrate():
     """
 
     # Get migration files
-    path = Path(f"./migrations/{Config.COUNTRY}")
+    path = Path("./migrations")
     files = sorted(glob.glob(
         str(path / "*.py")
     ))
 
     if not files:
         raise ValueError(f"No migration files found in {path}")
+
+    # Create migrations log directory if it doesn't exist
+    log_dir = Path("/var/log/migrations")
+    log_dir.mkdir(parents=True, exist_ok=True)
 
     # Execute each migration file
     for file in files:
@@ -88,6 +89,8 @@ def relay():
     """
     Runs the relay.
     """
+    # Validate the configuration
+    RelayConfig.validate()
 
     import relay.main as module
     asyncio.run(module.main())
@@ -96,17 +99,20 @@ def run(workers="1", host="localhost", port=8080, reload=False):
     """
     Runs the application.
     """
+    # Validate the configuration
+    MainConfig.validate()
 
     if reload:
         subprocess.run([
-            "gunicorn", 
-            "--bind", f"{host}:{port}", 
-            "--workers", workers,
-            "--worker-class", "uvicorn.workers.UvicornWorker",
-            "--env", "GUNICORN_WORKER_ID=${GUNICORN_WORKER_ID:-0}",
+            "uvicorn",
+            "app:asgi_app",
+            "--host", host,
+            "--port", str(port),
             "--reload",
-            "app:asgi_app"
-        ])
+            "--reload-dir", ".",
+            "--reload-delay", "0.25",
+            "--log-level", "debug"
+        ], cwd=os.path.dirname(os.path.abspath(__file__)))
     else:
         subprocess.run([
             "gunicorn", 
@@ -128,6 +134,9 @@ def main():
     # Migrate command
     subparsers.add_parser('migrate', help='Run database migrations')
 
+    # Relay command
+    subparsers.add_parser('relay', help='Run the relay')
+
     # Run command
     run_parser = subparsers.add_parser('run', help='Run the application')
     run_parser.add_argument('--workers', default='1', help='Number of workers to run with Gunicorn')
@@ -145,6 +154,7 @@ def main():
         relay()
     elif args.command == 'run':
         print("Starting server...")
+        print(f"Starting with reload: {args.reload}")
         run(args.workers, args.host, args.port, args.reload)
     else:
         parser.print_help()

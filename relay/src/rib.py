@@ -141,7 +141,8 @@ def rib_task(host, queue, db, logger, events, memory):
         # Get RIB file URL
         if host.startswith("rrc"):
             # RIS Route Collectors
-            url = f"https://data.ris.ripe.net/{host}/latest-bview.gz"
+            filename = "latest-bview.gz"
+            url = f"https://data.ris.ripe.net/{host}/{filename}"
         else:
             # Route Views Collectors
             if host == "route-views2":
@@ -152,12 +153,12 @@ def rib_task(host, queue, db, logger, events, memory):
             response = requests.get(index, timeout=30)
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
-            latest = soup.find_all('a')[-1].text
-            url = f'{index}{latest}'
+            filename = soup.find_all('a')[-1].text
+            url = f'{index}{filename}'
 
         # Download the RIB file
         tmp_dir = tempfile.gettempdir()
-        tmp_file = os.path.join(tmp_dir, latest)
+        tmp_file = os.path.join(tmp_dir, filename)
 
         class BytesTrackingAdapter(requests.adapters.HTTPAdapter):
             def send(self, request, **kwargs):

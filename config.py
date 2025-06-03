@@ -1,38 +1,54 @@
-from flask import Config
 import os
 
-class Config(Config):
-    # Flask
-    HOST = os.getenv('FLASK_HOST')
-    SECRET_KEY = os.getenv('SECRET_KEY')
+class BaseConfig:
     ENVIRONMENT = os.getenv('ENVIRONMENT')
-    # MongoDB
-    MONGODB_URI = os.getenv('MONGODB_URI')
+    LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
+
+class MainConfig(BaseConfig):
+    # Flask
+    FLASK_HOST = os.getenv('FLASK_HOST')
+    SECRET_KEY = os.getenv('SECRET_KEY')
+
     # Postgres
-    POSTGRESQL_HOST = os.getenv('POSTGRESQL_HOST')
-    POSTGRESQL_DB = os.getenv('POSTGRESQL_DB')
-    POSTGRESQL_USER = os.getenv('POSTGRESQL_USER')
-    POSTGRESQL_PASSWORD = os.getenv('POSTGRESQL_PASSWORD')
+    POSTGRES_HOST = os.getenv('POSTGRES_HOST')
+    POSTGRES_PORT = os.getenv('POSTGRES_PORT')
+    POSTGRES_DB = os.getenv('POSTGRES_DB')
+    POSTGRES_USER = os.getenv('POSTGRES_USER')
+    POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
+
     # Postmark
     POSTMARK_API_KEY = os.getenv('POSTMARK_API_KEY')
 
     @staticmethod
     def validate():
-        if not Config.HOST:
-            raise ValueError("HOST is not set")
-        if not Config.SECRET_KEY:
-            raise ValueError("SECRET_KEY is not set")
-        if not Config.ENVIRONMENT in ["production", "development"]:
-            raise ValueError("ENVIRONMENT is not valid")
-        if not Config.MONGODB_URI:
-            raise ValueError("MONGODB_URI is not set")
-        if not Config.POSTMARK_API_KEY:
-            raise ValueError("POSTMARK_API_KEY is not set")
-        if not Config.POSTGRESQL_HOST:
-            raise ValueError("POSTGRESQL_HOST is not set")
-        if not Config.POSTGRESQL_DB:
-            raise ValueError("POSTGRESQL_DB is not set")
-        if not Config.POSTGRESQL_USER:
-            raise ValueError("POSTGRESQL_USER is not set")
-        if not Config.POSTGRESQL_PASSWORD:
-            raise ValueError("POSTGRESQL_PASSWORD is not set")
+        required = {
+            'ENVIRONMENT': MainConfig.ENVIRONMENT,
+            'SECRET_KEY': MainConfig.SECRET_KEY,
+            'FLASK_HOST': MainConfig.FLASK_HOST,
+            'POSTMARK_API_KEY': MainConfig.POSTMARK_API_KEY,
+            'POSTGRES_HOST': MainConfig.POSTGRES_HOST,
+            'POSTGRES_PORT': MainConfig.POSTGRES_PORT,
+            'POSTGRES_DB': MainConfig.POSTGRES_DB,
+            'POSTGRES_USER': MainConfig.POSTGRES_USER,
+            'POSTGRES_PASSWORD': MainConfig.POSTGRES_PASSWORD,
+        }
+        for key, val in required.items():
+            if not val:
+                raise ValueError(f"{key} is not set")
+
+
+class RelayConfig(BaseConfig):
+    HOST = os.getenv('HOST')
+    KAFKA_CONNECT = os.getenv('KAFKA_CONNECT')
+    OPENBMP_CONNECT = os.getenv('OPENBMP_CONNECT')
+
+    @staticmethod
+    def validate():
+        required = {
+            'HOST': RelayConfig.HOST,
+            'KAFKA_CONNECT': RelayConfig.KAFKA_CONNECT,
+            'OPENBMP_CONNECT': RelayConfig.OPENBMP_CONNECT,
+        }
+        for key, val in required.items():
+            if not val:
+                raise ValueError(f"{key} is not set")

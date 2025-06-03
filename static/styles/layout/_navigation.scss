@@ -1,6 +1,6 @@
 #navigation {
     border-bottom: 1px solid #e0e0e0;
-    height: 48px;
+    height: 3rem;
     width: 100%;
     position: sticky;
     background: #ffffff;
@@ -59,7 +59,7 @@
 
                 .item__link {
                     font-size: 1rem;
-                    font-weight: 250;
+                    font-weight: 350;
                     line-height: 1.375em;
                     letter-spacing: 0;
                     color: #161616;
@@ -97,7 +97,7 @@
                     z-index: var(--z-index-dropdown);
 
                     .dropdown__item {
-                        height: 48px;
+                        height: 3rem;
                         background: #f5f5f5;
                         text-decoration: none;
                         transition: background 110ms;
@@ -112,7 +112,7 @@
 
                         .item__link {
                             font-size: 1rem;
-                            font-weight: 250;
+                            font-weight: 350;
                             line-height: 1.375em;
                             letter-spacing: 0;
                             color: #161616;
@@ -165,7 +165,7 @@
                 text-decoration: none;
                 line-height: 2rem;
                 font-size: 1rem;
-                font-weight: 250;
+                font-weight: 350;
                 cursor: pointer;
                 display: inline-flex;
                 -webkit-box-align: center;

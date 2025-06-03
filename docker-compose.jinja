@@ -11,7 +11,7 @@ services:
                 constraints:
                     - node.role == manager
         healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            test: ["CMD-SHELL", "pg_isready -U openbmp"]
             interval: 30s
             timeout: 10s
             retries: 5
@@ -29,9 +29,9 @@ services:
         command: >
             -c max_wal_size=10GB
         environment:
-            POSTGRES_PASSWORD: postgres
-            POSTGRES_USER: postgres
-            POSTGRES_DB: postgres
+            POSTGRES_PASSWORD: openbmp
+            POSTGRES_USER: openbmp
+            POSTGRES_DB: openbmp
         
     web:
         {%- if production %}
@@ -40,6 +40,10 @@ services:
         build: .
         {%- endif %}
         restart: unless-stopped
+        {%- if not production %}
+        ports:
+            - "8080:8080"
+        {%- endif %}
         deploy:
             restart_policy:
                 condition: any
@@ -53,17 +57,18 @@ services:
             retries: 3
             start_period: 40s
         environment:
-            SECRET_KEY=${SECRET_KEY}
-            POSTGRESQL_HOST: postgres:5432
-            POSTGRESQL_DB: postgres
-            POSTGRESQL_USER: postgres
-            POSTGRESQL_PASSWORD: postgres
-            POSTMARK_API_KEY=${POSTMARK_API_KEY}
-            FLASK_HOST=http://localhost:8080
+            SECRET_KEY: ${SECRET_KEY}
+            POSTGRES_HOST: postgres
+            POSTGRES_PORT: 5432
+            POSTGRES_DB: openbmp
+            POSTGRES_USER: openbmp
+            POSTGRES_PASSWORD: openbmp
+            POSTMARK_API_KEY: ${POSTMARK_API_KEY}
+            FLASK_HOST: http://localhost:8080
             {%- if production %}
-            ENVIRONMENT=production
+            ENVIRONMENT: production
             {%- else %}
-            ENVIRONMENT=development
+            ENVIRONMENT: development
             {%- endif %}
         depends_on:
             postgres:
@@ -87,7 +92,7 @@ services:
         build: .
         {%- endif %}
         restart: unless-stopped
-        stop_signal: SIGTERM                    # Wind down collector safely before stopping
+        stop_signal: SIGTERM                    # Wind down relay safely before stopping
         stop_grace_period: 20s                  # Wait for 20 seconds before forcefully stopping
         deploy:
             restart_policy:
@@ -96,11 +101,11 @@ services:
                 constraints:
                     - node.role == manager
         environment:
-            COLLECTOR_HOST: {{ host }}
-            COLLECTOR_KAFKA_CONNECT: stream.ris-kafka.com:9092
-            COLLECTOR_OPENBMP_CONNECT: collector-{{ host | replace(".", "-") }}:5000
+            HOST: {{ host }}
+            KAFKA_CONNECT: stream.ris-kafka.com:9092
+            OPENBMP_CONNECT: collector-{{ host | replace(".", "-") }}:5000
         depends_on:
-            collector:
+            collector-{{ host | replace(".", "-") }}:
                 condition: service_healthy
         volumes:
             {%- if not production %}
@@ -108,7 +113,7 @@ services:
             {%- endif %}
             - relay_{{ host | replace(".", "_") | replace("-", "_") }}_data:/var/lib/rocksdb
         entrypoint: >
-            python manage.py collector
+            python manage.py relay
     {% endfor %}
 
     {%- for host in routeviews %}
@@ -128,11 +133,11 @@ services:
                 constraints:
                     - node.role == manager
         environment:
-            COLLECTOR_HOST: {{ host }}
-            COLLECTOR_KAFKA_CONNECT: stream.routeviews.org:9092
-            COLLECTOR_OPENBMP_CONNECT: collector-{{ host | replace(".", "-") }}:5000
+            HOST: {{ host }}
+            KAFKA_CONNECT: stream.routeviews.org:9092
+            OPENBMP_CONNECT: collector-{{ host | replace(".", "-") }}:5000
         depends_on:
-            collector:
+            collector-{{ host | replace(".", "-") }}:
                 condition: service_healthy
         volumes:
             {%- if not production %}
@@ -140,7 +145,7 @@ services:
             {%- endif %}
             - relay_{{ host | replace(".", "_") | replace("-", "_") }}_data:/var/lib/rocksdb
         entrypoint: >
-            python manage.py collector
+            python manage.py relay
     {% endfor %}
     
     openbmp:
@@ -177,9 +182,9 @@ services:
                                                              #   bursts increase the value, ex 60 minute
             POSTGRES_HOST: postgres
             POSTGRES_PORT: 5432
-            POSTGRES_DB: postgres
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: openbmp
+            POSTGRES_USER: openbmp
+            POSTGRES_PASSWORD: openbmp
             POSTGRES_DROP_peer_event_log: '1 month'
             POSTGRES_DROP_stat_reports: '1 day'
             POSTGRES_DROP_ip_rib_log: '1 day'
@@ -251,9 +256,9 @@ services:
         ports:
             - "4300:43"
         environment:
-            POSTGRES_PASSWORD: postgres
-            POSTGRES_USER: postgres
-            POSTGRES_DB: postgres
+            POSTGRES_PASSWORD: openbmp
+            POSTGRES_USER: openbmp
+            POSTGRES_DB: openbmp
             POSTGRES_HOST: postgres
             POSTGRES_PORT: 5432
 

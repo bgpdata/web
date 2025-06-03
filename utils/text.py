@@ -3,9 +3,7 @@ BGPDATA - A BGP Data Aggregation Service.
 © 2024 BGPDATA. All rights reserved.
 """
 from bs4 import BeautifulSoup, Comment
-from flask import current_app as app
 from datetime import datetime
-from utils.database import db
 import hashlib
 import bleach
 import re

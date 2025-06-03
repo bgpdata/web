@@ -4,8 +4,8 @@ BGPDATA - A BGP Data Aggregation Service.
 """
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+from config import MainConfig as Config
 from sqlalchemy import update
-from config import Config
 from datetime import datetime
 import threading
 import asyncio
@@ -15,7 +15,7 @@ import time
 # Connect to PostgreSQL
 PostgreSQL = sessionmaker(
     create_async_engine(
-        f"postgresql+asyncpg://{Config.POSTGRESQL_USER}:{Config.POSTGRESQL_PASSWORD}@{Config.POSTGRESQL_HOST}/{Config.POSTGRESQL_DB}",
+        f"postgresql+asyncpg://{Config.POSTGRES_USER}:{Config.POSTGRES_PASSWORD}@{Config.POSTGRES_HOST}:{Config.POSTGRES_PORT}/{Config.POSTGRES_DB}",
         echo=False
     ),
     expire_on_commit=False,

@@ -83,7 +83,12 @@ class MRT:
     }
 
     # BGP attributes
-    BGP_ATTRIBUTES = {
+    # https://www.iana.org/assignments/bgp-parameters/bgp-parameters.xhtml
+    class BgpAttributes(dict):
+        def __getitem__(self, key):
+            return super().get(key, None)
+
+    BGP_ATTRIBUTES = BgpAttributes({
         1: 'ORIGIN',
         2: 'AS_PATH',
         3: 'NEXT_HOP',
@@ -106,7 +111,7 @@ class MRT:
         32: 'BGP-LS',               # Defined in RFC7752
         35: 'PREFIX_SID',           # Defined in RFC8669
         128: 'ATTR_SET',            # Defined in RFC6368
-    }
+    })
 
     def __init__(self, file_path):
         f = open(file_path, 'rb')
