@@ -35,7 +35,7 @@ services:
         
     web:
         {%- if production %}
-        image: bgpdata/bgpdata:0.1.5
+        image: bgpdata/bgpdata:0.1.6
         {%- else %}
         build: .
         {%- endif %}
@@ -87,7 +87,7 @@ services:
     {%- for host in ris %}
     relay-{{ host | replace(".", "-") }}:
         {%- if production %}
-        image: bgpdata/bgpdata:0.1.5
+        image: bgpdata/bgpdata:0.1.6
         {%- else %}
         build: .
         {%- endif %}
@@ -118,7 +118,7 @@ services:
     {%- for host in routeviews %}
     relay-{{ host | replace(".", "-") }}:
         {%- if production %}
-        image: bgpdata/bgpdata:0.1.5
+        image: bgpdata/bgpdata:0.1.6
         {%- else %}
         build: .
         {%- endif %}
