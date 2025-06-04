@@ -14,6 +14,7 @@ LICENSE ("AGREEMENT"). ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM
 CONSTITUTES RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT.
 """
 from scapy.contrib.bgp import BGPHeader, BGPOpen, BGPUpdate, BGPOptParam, BGPCapMultiprotocol, BGPCapGeneric, BGPCapFourBytesASN
+from config import RelayConfig as Config
 from bs4 import BeautifulSoup
 from datetime import datetime
 from libs.bmp import BMPv3
@@ -25,7 +26,7 @@ import struct
 import time
 import os
 
-def rib_task(host, queue, db, logger, events, memory):
+def rib_task(queue, db, logger, events, memory):
     """
     Task to inject RIB messages from MRT Data Dumps into the queue.
     """
@@ -139,16 +140,16 @@ def rib_task(host, queue, db, logger, events, memory):
                 return bmp_message
 
         # Get RIB file URL
-        if host.startswith("rrc"):
+        if Config.HOST.startswith("rrc"):
             # RIS Route Collectors
             filename = "latest-bview.gz"
-            url = f"https://data.ris.ripe.net/{host}/{filename}"
+            url = f"https://data.ris.ripe.net/{Config.HOST}/{filename}"
         else:
             # Route Views Collectors
-            if host == "route-views2":
+            if Config.HOST == "route-views2":
                 index = f"https://archive.routeviews.org/bgpdata/{datetime.now().year}.{datetime.now().month:02d}/RIBS/"
             else:
-                index = f"https://archive.routeviews.org/{host}/bgpdata/{datetime.now().year}.{datetime.now().month:02d}/RIBS/"
+                index = f"https://archive.routeviews.org/{Config.HOST}/bgpdata/{datetime.now().year}.{datetime.now().month:02d}/RIBS/"
 
             response = requests.get(index, timeout=30)
             response.raise_for_status()
@@ -241,7 +242,7 @@ def rib_task(host, queue, db, logger, events, memory):
                                                             raw_path_attributes,
                                                             raw_prefix_nlri,
                                                             mp_reach,
-                                                            f'{host}.ripe.net' if host.startswith('rrc') else host,
+                                                            f'{Config.HOST}.ripe.net' if Config.HOST.startswith('rrc') else Config.HOST,
                                                             entry['mrt_header']['timestamp'])
 
         # Check for updates
@@ -271,7 +272,7 @@ def rib_task(host, queue, db, logger, events, memory):
                     peers[peer_index]['asn'],
                     min_timestamps[peers[peer_index]['asn']] - 1,
                     bgp_open,
-                    f'{host}.ripe.net' if host.startswith('rrc') else host
+                    f'{Config.HOST}.ripe.net' if Config.HOST.startswith('rrc') else Config.HOST
                 )
                 messages.append(bmp_message)
 
@@ -289,7 +290,7 @@ def rib_task(host, queue, db, logger, events, memory):
                     peers[peer_index]['asn'],
                     max_timestamps[peers[peer_index]['asn']] + 1,
                     bgp_update,
-                    f'{host}.ripe.net' if host.startswith('rrc') else host
+                    f'{Config.HOST}.ripe.net' if Config.HOST.startswith('rrc') else Config.HOST
                 )
                 messages.append(bmp_message)
   

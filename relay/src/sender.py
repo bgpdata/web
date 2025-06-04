@@ -2,13 +2,14 @@
 BGPDATA - A BGP Data Aggregation Service.
 © 2024 BGPDATA. All rights reserved.
 """
+from config import RelayConfig as Config
 from libs.bmp import BMPv3
 import queue as queueio
 import select
 import socket
 import time
 
-def sender_task(openbmp, queue, db, logger, events, memory):
+def sender_task(queue, db, logger, events, memory):
     """
     Task to transmit messages from the queue to the OpenBMP TCP socket.
     """
@@ -18,9 +19,9 @@ def sender_task(openbmp, queue, db, logger, events, memory):
         backpressure_threshold = 1.0  # Threshold in seconds to detect backpressure
         send_delay = 0.0  # Initial delay between sends
 
-        # Create a connection to the openbmp
-        logger.info(f"Connecting to {openbmp}")
-        with socket.create_connection((openbmp.split(':')[0], int(openbmp.split(':')[1])), timeout=60) as sock:
+        # Create a connection to the collector
+        logger.info(f"Connecting to {Config.OPENBMP_CONNECT}")
+        with socket.create_connection((Config.OPENBMP_CONNECT.split(':')[0], int(Config.OPENBMP_CONNECT.split(':')[1])), timeout=60) as sock:
             while True:
                 try:
                     # Ensure the connection is alive

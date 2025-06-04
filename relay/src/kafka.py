@@ -4,13 +4,14 @@ BGPDATA - A BGP Data Aggregation Service.
 """
 from confluent_kafka import KafkaError, Consumer, TopicPartition, KafkaException
 from confluent_kafka.admin import AdminClient
+from config import RelayConfig as Config
 from datetime import datetime
 import socket
 import struct
 import time
 import re
 
-def kafka_task(host, kafka, queue, db, logger, events, memory):
+def kafka_task(queue, db, logger, events, memory):
     """
     Task to poll a batch of messages from Kafka and add them to the queue.
     """
@@ -23,16 +24,16 @@ def kafka_task(host, kafka, queue, db, logger, events, memory):
         memory['task'] = "kafka"
 
         # Log the connection
-        logger.info(f"Connecting to {kafka}")
+        logger.info(f"Connecting to {Config.KAFKA_CONNECT}")
 
         # Create Kafka Admin Client
         admin = AdminClient({
-            'bootstrap.servers': kafka,
+            'bootstrap.servers': Config.KAFKA_CONNECT,
         })
 
         # Create Kafka Consumer
         consumer = Consumer({
-            'bootstrap.servers': kafka,
+            'bootstrap.servers': Config.KAFKA_CONNECT,
             'group.id': f'bgpdata-{socket.gethostname()}',
             'partition.assignment.strategy': 'roundrobin',
             'enable.auto.commit': False,
@@ -102,7 +103,7 @@ def kafka_task(host, kafka, queue, db, logger, events, memory):
         # Get all topics
         all_topics = admin.list_topics(timeout=15).topics.keys()
         # Define regex for final filtering
-        escaped_host = re.escape(host).replace(r'\-', '[-]?')
+        escaped_host = re.escape(Config.HOST).replace(r'\-', '[-]?')
         pattern = re.compile(rf"^{escaped_host}\.(\d+)\.bmp_raw$")
         # Apply regex filtering on the pre-filtered list
         matching_topics = [(topic, pattern.match(topic).group(1)) for topic in all_topics if pattern.match(topic)]

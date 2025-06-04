@@ -2,9 +2,10 @@
 BGPDATA - A BGP Data Aggregation Service.
 © 2024 BGPDATA. All rights reserved.
 """
+from config import RelayConfig as Config
 import time
 
-def logging_task(host, queue, logger, events, memory):
+def logging_task(queue, logger, events, memory):
     """
     Task to periodically log the current state of the collector.
     """
@@ -25,11 +26,11 @@ def logging_task(host, queue, logger, events, memory):
 
             match memory['task']:
                 case 'rib':
-                    logger.info(f"host={host} task={memory['task']} processing={memory['rows_processed']} rps receive={kbps_received:.2f} kbps send={kbps_sent:.2f} kbps queued={queue.qsize()}")
+                    logger.info(f"host={Config.HOST} task={memory['task']} processing={memory['rows_processed']} rps receive={kbps_received:.2f} kbps send={kbps_sent:.2f} kbps queued={queue.qsize()}")
                 case 'kafka':
-                    logger.info(f"host={host} task={memory['task']} lag={int(h)}h {int(m)}m {int(s)}s receive={kbps_received:.2f} kbps send={kbps_sent:.2f} kbps queued={queue.qsize()}")
+                    logger.info(f"host={Config.HOST} task={memory['task']} lag={int(h)}h {int(m)}m {int(s)}s receive={kbps_received:.2f} kbps send={kbps_sent:.2f} kbps queued={queue.qsize()}")
                 case _:
-                    logger.info(f"host={host} task={memory['task']} receive={kbps_received:.2f} kbps send={kbps_sent:.2f} kbps queued={queue.qsize()}")
+                    logger.info(f"host={Config.HOST} task={memory['task']} receive={kbps_received:.2f} kbps send={kbps_sent:.2f} kbps queued={queue.qsize()}")
                 
             # Reset trackers
             memory['bytes_sent'] = 0

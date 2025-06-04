@@ -16,8 +16,10 @@ services:
             retries: 5
         privileged: true
         shm_size: 1536m
+        {%- if not production %}
         ports:
             - "5432:5432"
+        {%- endif %}
         sysctls:
             - net.ipv4.tcp_keepalive_intvl=30
             - net.ipv4.tcp_keepalive_probes=5
@@ -111,7 +113,7 @@ services:
             {%- endif %}
             - relay_{{ host | replace(".", "_") | replace("-", "_") }}_data:/var/lib/rocksdb
         entrypoint: >
-            python manage.py relay
+            bash -c "sleep $$(({{ loop.index0 }} * {{ delay }})) && python manage.py relay"
     {% endfor %}
 
     {%- for host in routeviews %}
@@ -142,7 +144,7 @@ services:
             {%- endif %}
             - relay_{{ host | replace(".", "_") | replace("-", "_") }}_data:/var/lib/rocksdb
         entrypoint: >
-            python manage.py relay
+            bash -c "sleep $$(({{ loop.index0 }} * {{ delay }})) && python manage.py relay"
     {% endfor %}
     
     openbmp:

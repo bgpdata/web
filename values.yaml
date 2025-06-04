@@ -1,4 +1,5 @@
 production: false
+delay: 120 # Seconds
 # RIS Route Collectors
 # https://ris.ripe.net/docs/route-collectors/
 ris:

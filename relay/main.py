@@ -80,17 +80,11 @@ async def main():
         )
         queue.put((message, 0, None, -1, False))
 
-        # Start rib task
-        loop.run_in_executor(executor, rib_task, Config.HOST, queue, db, logger, events, memory)
-
-        # Start kafka task
-        loop.run_in_executor(executor, kafka_task, Config.HOST, Config.KAFKA_CONNECT, queue, db, logger, events, memory)
-
-        # Start sender task
-        loop.run_in_executor(executor, sender_task, Config.OPENBMP_CONNECT, queue, db, logger, events, memory)
-
-        # Start logging task
-        loop.run_in_executor(executor, logging_task, Config.HOST, queue, logger, events, memory)
+        # Start tasks
+        loop.run_in_executor(executor, rib_task, queue, db, logger, events, memory)
+        loop.run_in_executor(executor, kafka_task, queue, db, logger, events, memory)
+        loop.run_in_executor(executor, sender_task, queue, db, logger, events, memory)
+        loop.run_in_executor(executor, logging_task, queue, logger, events, memory)
 
         # Wait for the shutdown event
         events['shutdown'].wait()
