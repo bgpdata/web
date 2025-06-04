@@ -31,33 +31,33 @@ ris:
 # https://www.routeviews.org/
 routeviews:
   - amsix.ams
-  - route-views.amsix
-  - route-views.bknix
-  - route-views.chicago
-  - route-views.chile
+  - amsix
+  - bknix
+  - chicago
+  - chile
   - cix.atl
   - decix.jhb
-  - route-views.eqix
-  - route-views.flix
-  - route-views.fortaleza
-#  - route-views.gorex
-#  - route-views.isc
-#  - route-views.kixp
-#  - route-views.linx
-#  - route-views.napafrica
-#  - route-views.ny
-#  - route-views.perth
-#  - route-views.rio
+  - eqix
+  - flix
+  - fortaleza
+#  - gorex
+#  - isc
+#  - kixp
+#  - linx
+#  - napafrica
+#  - ny
+#  - perth
+#  - rio
 #  - route-views2.saopaulo
 #  - route-views3
 #  - route-views4
 #  - route-views5
 #  - route-views6
 #  - route-views7
-#  - route-views.sfmix
-#  - route-views.sg
-#  - route-views.soxrs
-#  - route-views.sydney
-#  - route-views.telxatl
-#  - route-views.uaeix
-#  - route-views.wide
+#  - sfmix
+#  - sg
+#  - soxrs
+#  - sydney
+#  - telxatl
+#  - uaeix
+#  - wide

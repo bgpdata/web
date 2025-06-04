@@ -85,56 +85,23 @@ services:
             /bin/sh -c "python manage.py migrate && python manage.py run --host 0.0.0.0 --reload"
             {%- endif %}
 
-    {%- for host in ris %}
+    {%- for host in ris + routeviews %}
     relay-{{ host | replace(".", "-") }}:
         {%- if production %}
         image: bgpdata/bgpdata:{{ version | default('latest') }}
         {%- else %}
         build: .
         {%- endif %}
-        restart: unless-stopped
+        restart: no
         stop_signal: SIGTERM                    # Wind down relay safely before stopping
         stop_grace_period: 20s                  # Wait for 20 seconds before forcefully stopping
         deploy:
             restart_policy:
-                condition: any
+                condition: none
             placement:
                 constraints:
                     - node.role == manager
         environment:
-            HOST: {{ host }}
-            KAFKA_CONNECT: stream.ris-kafka.com:9092
-            OPENBMP_CONNECT: collector-{{ host | replace(".", "-") }}:5000
-        depends_on:
-            - collector-{{ host | replace(".", "-") }}
-        volumes:
-            {%- if not production %}
-            - .:/app
-            {%- endif %}
-            - relay_{{ host | replace(".", "_") | replace("-", "_") }}_data:/var/lib/rocksdb
-        entrypoint: >
-            bash -c "sleep $$(({{ loop.index0 }} * {{ delay }})) && python manage.py relay"
-    {% endfor %}
-
-    {%- for host in routeviews %}
-    relay-{{ host | replace(".", "-") }}:
-        {%- if production %}
-        image: bgpdata/bgpdata:{{ version | default('latest') }}
-        {%- else %}
-        build: .
-        {%- endif %}
-        restart: unless-stopped
-        stop_signal: SIGTERM                    # Wind down collector safely before stopping
-        stop_grace_period: 20s                  # Wait for 20 seconds before forcefully stopping
-        deploy:
-            restart_policy:
-                condition: any
-            placement:
-                constraints:
-                    - node.role == manager
-        environment:
-            HOST: {{ host }}
-            KAFKA_CONNECT: stream.routeviews.org:9092
             OPENBMP_CONNECT: collector-{{ host | replace(".", "-") }}:5000
         depends_on:
             - collector-{{ host | replace(".", "-") }}
@@ -147,6 +114,34 @@ services:
             bash -c "sleep $$(({{ loop.index0 }} * {{ delay }})) && python manage.py relay"
     {% endfor %}
     
+    {%- for host in ris + routeviews %}
+    collector-{{ host | replace(".", "-") }}:
+        image: openbmp/collector:2.2.3
+        restart: no
+        deploy:
+            restart_policy:
+                condition: none
+            placement:
+                constraints:
+                    - node.role == worker
+        healthcheck:
+            test: ["CMD-SHELL", "cat", "< /dev/null >", "/dev/tcp/localhost/5000"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+        depends_on:
+            - postgres
+            - kafka
+        sysctls:
+            - net.ipv4.tcp_keepalive_intvl=30
+            - net.ipv4.tcp_keepalive_probes=5
+            - net.ipv4.tcp_keepalive_time=180
+        volumes:
+            - openbmp_data:/config
+        environment:
+            KAFKA_FQDN: kafka:29092
+    {% endfor %}
+
     openbmp:
         image: openbmp/psql-app:2.2.2
         restart: unless-stopped
@@ -196,33 +191,6 @@ services:
             POSTGRES_DROP_stats_peer_rib: '1 day'
             POSTGRES_DROP_stats_peer_update_counts: '1 day'
 
-    {%- for host in ris + routeviews %}
-    collector-{{ host | replace(".", "-") }}:
-        image: openbmp/collector:2.2.3
-        restart: unless-stopped
-        deploy:
-            restart_policy:
-                condition: any
-            placement:
-                constraints:
-                    - node.role == worker
-        healthcheck:
-            test: ["CMD-SHELL", "cat", "< /dev/null >", "/dev/tcp/localhost/5000"]
-            interval: 30s
-            timeout: 10s
-            retries: 3
-        depends_on:
-            - postgres
-            - kafka
-        sysctls:
-            - net.ipv4.tcp_keepalive_intvl=30
-            - net.ipv4.tcp_keepalive_probes=5
-            - net.ipv4.tcp_keepalive_time=180
-        volumes:
-            - openbmp_data:/config
-        environment:
-            KAFKA_FQDN: kafka:29092
-    {% endfor %}
 
     whois:
         image: openbmp/whois:2.2.0

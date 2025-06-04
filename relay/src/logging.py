@@ -24,14 +24,12 @@ def logging_task(queue, logger, events, memory):
             h, remainder = divmod(maximum_lag.total_seconds() if maximum_lag else 0, 3600)
             m, s = divmod(remainder, 60)
 
-            match memory['task']:
-                case 'rib':
-                    logger.info(f"host={Config.HOST} task={memory['task']} processing={memory['rows_processed']} rps receive={kbps_received:.2f} kbps send={kbps_sent:.2f} kbps queued={queue.qsize()}")
-                case 'kafka':
-                    logger.info(f"host={Config.HOST} task={memory['task']} lag={int(h)}h {int(m)}m {int(s)}s receive={kbps_received:.2f} kbps send={kbps_sent:.2f} kbps queued={queue.qsize()}")
-                case _:
-                    logger.info(f"host={Config.HOST} task={memory['task']} receive={kbps_received:.2f} kbps send={kbps_sent:.2f} kbps queued={queue.qsize()}")
-                
+            if memory['task'] == 'rib':
+                logger.info(f"host={Config.HOST} task={memory['task']} processing={memory['rows_processed']} rps receive={kbps_received:.2f} kbps send={kbps_sent:.2f} kbps queued={queue.qsize()}")
+            elif memory['task'] == 'kafka':
+                logger.info(f"host={Config.HOST} task={memory['task']} lag={int(h)}h {int(m)}m {int(s)}s receive={kbps_received:.2f} kbps send={kbps_sent:.2f} kbps queued={queue.qsize()}")
+            else:
+                logger.info(f"host={Config.HOST} task={memory['task']} receive={kbps_received:.2f} kbps send={kbps_sent:.2f} kbps queued={queue.qsize()}")
             # Reset trackers
             memory['bytes_sent'] = 0
             memory['bytes_received'] = 0

@@ -23,17 +23,23 @@ def kafka_task(queue, db, logger, events, memory):
         # Broadcast the stage
         memory['task'] = "kafka"
 
+        # Get the host
+        if Config.HOST.startswith('rrc'):
+            host = 'stream.ris-kafka.com:9092'
+        else:
+            host = 'stream.routeviews.org:9092'
+
         # Log the connection
-        logger.info(f"Connecting to {Config.KAFKA_CONNECT}")
+        logger.info(f"Connecting to {host}")
 
         # Create Kafka Admin Client
         admin = AdminClient({
-            'bootstrap.servers': Config.KAFKA_CONNECT,
+            'bootstrap.servers': host,
         })
 
         # Create Kafka Consumer
         consumer = Consumer({
-            'bootstrap.servers': Config.KAFKA_CONNECT,
+            'bootstrap.servers': host,
             'group.id': f'bgpdata-{socket.gethostname()}',
             'partition.assignment.strategy': 'roundrobin',
             'enable.auto.commit': False,
@@ -103,8 +109,8 @@ def kafka_task(queue, db, logger, events, memory):
         # Get all topics
         all_topics = admin.list_topics(timeout=15).topics.keys()
         # Define regex for final filtering
-        escaped_host = re.escape(Config.HOST).replace(r'\-', '[-]?')
-        pattern = re.compile(rf"^{escaped_host}\.(\d+)\.bmp_raw$")
+        host = Config.HOST if Config.HOST.startswith('rrc') else f'routeviews.{Config.HOST}'
+        pattern = re.compile(rf"^{re.escape(host)}\.(\d+)\.bmp_raw$")
         # Apply regex filtering on the pre-filtered list
         matching_topics = [(topic, pattern.match(topic).group(1)) for topic in all_topics if pattern.match(topic)]
         # All valid topics

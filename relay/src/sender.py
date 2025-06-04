@@ -21,7 +21,7 @@ def sender_task(queue, db, logger, events, memory):
 
         # Create a connection to the collector
         logger.info(f"Connecting to {Config.OPENBMP_CONNECT}")
-        with socket.create_connection((Config.OPENBMP_CONNECT.split(':')[0], int(Config.OPENBMP_CONNECT.split(':')[1])), timeout=60) as sock:
+        with socket.create_connection((Config.OPENBMP_CONNECT.split(':')[0], int(Config.OPENBMP_CONNECT.split(':')[1])), timeout=300) as sock:
             while True:
                 try:
                     # Ensure the connection is alive
