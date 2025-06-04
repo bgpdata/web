@@ -92,7 +92,7 @@ services:
         {%- else %}
         build: .
         {%- endif %}
-        restart: no
+        restart: "no"
         stop_signal: SIGTERM                    # Wind down relay safely before stopping
         stop_grace_period: 20s                  # Wait for 20 seconds before forcefully stopping
         deploy:
@@ -118,7 +118,7 @@ services:
     {%- for host in ris + routeviews %}
     collector-{{ host | replace(".", "-") }}:
         image: openbmp/collector:2.2.3
-        restart: no
+        restart: "no"
         deploy:
             restart_policy:
                 condition: none
