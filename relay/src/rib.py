@@ -146,10 +146,29 @@ def rib_task(queue, db, logger, events, memory):
             url = f"https://data.ris.ripe.net/{Config.HOST}/{filename}"
         else:
             # Route Views Collectors
+            inconsistent_hosts = [
+                "route-views3",
+                "route-views4",
+                "route-views5",
+                "route-views6",
+                "route-views7",
+                "route-views8",
+                "amsix.ams",
+                "cix.atl",
+                "interlan.otp",
+                "iraq-ixp.bgw",
+                "kinx.icn",
+                "namex.fco",
+                "pacwave.lax",
+                "pit.scl",
+                "pitmx.qro",
+                "route-views2.saopaulo"
+            ]
+            
             if Config.HOST == "route-views2":
-                index = f"https://archive.routeviews.org/bgpdata/{datetime.now().year}.{datetime.now().month:02d}/RIBS/"
-            elif Config.HOST.startswith("route-views"):
-                index = f"https://archive.routeviews.org/{Config.HOST}/bgpdata/{datetime.now().year}.{datetime.now().month:02d}/RIBS/"
+                index = f"https://archive.routeviews.org/bgpdata/{datetime.now().year}/{datetime.now().month:02d}/RIBS/"
+            elif Config.HOST in inconsistent_hosts:
+                index = f"https://archive.routeviews.org/{Config.HOST}/bgpdata/{datetime.now().year}/{datetime.now().month:02d}/RIBS/"
             else:
                 index = f"https://archive.routeviews.org/route-views.{Config.HOST}/bgpdata/{datetime.now().year}.{datetime.now().month:02d}/RIBS/"
 

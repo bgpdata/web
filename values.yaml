@@ -30,34 +30,52 @@ ris:
 # RouteViews Collectors
 # https://www.routeviews.org/
 routeviews:
-  - amsix.ams
-  - amsix
-  - bknix
-  - chicago
-  - chile
-  - cix.atl
-  - decix.jhb
-  - eqix
-  - flix
-  - fortaleza
-  - gorex
-  - isc
-  - kixp
-  - linx
-  - napafrica
-  - ny
-  - perth
-  - rio
-  - route-views2.saopaulo
+  - route-views2
   - route-views3
   - route-views4
   - route-views5
   - route-views6
   - route-views7
-  - sfmix
-  - sg
-  - soxrs
-  - sydney
+  - route-views8
+  - amsix
+  - amsix.ams
+  - cix.atl
+  - bdix
+  - bknix
+  - chicago
+  - chile
+  - eqix
+  - flix
+  - gixa
+  - gorex
+  - interlan.otp
+  - iraq-ixp.bgw
+  - isc
+  - kinx.icn
+  - namex.fco
+  - kixp
+  - jinx
+  - linx
+  - mwix
+  - napafrica
+  - nwax
+  - pacwave.lax
+  - pit.scl
+  - pitmx.qro
+  - phiox
   - telxatl
-  - uaeix
   - wide
+  - sydney
+  - saopaulo
+  - route-views2.saopaulo
+  - sg
+  - perth
+  - peru
+  - sfmix
+  - siex
+  - soxrs
+  - rio
+  - fortaleza
+  - uaeix
+  - ny
+
