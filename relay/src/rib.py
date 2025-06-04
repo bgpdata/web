@@ -148,10 +148,12 @@ def rib_task(queue, db, logger, events, memory):
             # Route Views Collectors
             if Config.HOST == "route-views2":
                 index = f"https://archive.routeviews.org/bgpdata/{datetime.now().year}.{datetime.now().month:02d}/RIBS/"
-            else:
+            elif Config.HOST.startswith("route-views"):
                 index = f"https://archive.routeviews.org/{Config.HOST}/bgpdata/{datetime.now().year}.{datetime.now().month:02d}/RIBS/"
+            else:
+                index = f"https://archive.routeviews.org/route-views.{Config.HOST}/bgpdata/{datetime.now().year}.{datetime.now().month:02d}/RIBS/"
 
-            response = requests.get(index, timeout=30)
+            response = requests.get(index, timeout=300)
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
             filename = soup.find_all('a')[-1].text

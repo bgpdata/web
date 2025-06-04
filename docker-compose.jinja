@@ -102,6 +102,7 @@ services:
                 constraints:
                     - node.role == manager
         environment:
+            HOST: {{ host }}
             OPENBMP_CONNECT: collector-{{ host | replace(".", "-") }}:5000
         depends_on:
             - collector-{{ host | replace(".", "-") }}
@@ -297,6 +298,7 @@ services:
             - ./grafana/provisioning/:/etc/grafana/provisioning/
         environment:
             GF_SECURITY_ADMIN_PASSWORD: openbmp
+            GF_AUTH_ANONYMOUS_ENABLED: true
             GF_USERS_HOME_PAGE: d/obmp-home/obmp-home
             GF_INSTALL_PLUGINS: agenty-flowcharting-panel,grafana-piechart-panel,grafana-worldmap-panel,grafana-simple-json-datasource,vonage-status-panel
     {%- endif %}

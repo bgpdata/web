@@ -86,8 +86,8 @@ def create_app():
         Talisman(
             app,
             content_security_policy=None,
-            force_https=True,
-            force_https_permanent=True
+            force_https=False,
+            force_https_permanent=False
         )
     else:
         # Disable Talisman completely in development

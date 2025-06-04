@@ -1,7 +1,7 @@
 import os
 
 class BaseConfig:
-    ENVIRONMENT = os.getenv('ENVIRONMENT')
+    ENVIRONMENT = os.getenv('ENVIRONMENT', 'development').lower()
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
 
 class MainConfig(BaseConfig):
@@ -39,14 +39,12 @@ class MainConfig(BaseConfig):
 
 class RelayConfig(BaseConfig):
     HOST = os.getenv('HOST')
-    KAFKA_CONNECT = os.getenv('KAFKA_CONNECT')
     OPENBMP_CONNECT = os.getenv('OPENBMP_CONNECT')
 
     @staticmethod
     def validate():
         required = {
             'HOST': RelayConfig.HOST,
-            'KAFKA_CONNECT': RelayConfig.KAFKA_CONNECT,
             'OPENBMP_CONNECT': RelayConfig.OPENBMP_CONNECT,
         }
         for key, val in required.items():
