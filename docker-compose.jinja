@@ -155,7 +155,7 @@ services:
                 condition: any
             placement:
                 constraints:
-                    - node.role == worker
+                    - node.role == manager
         depends_on:
             - postgres
             - kafka
