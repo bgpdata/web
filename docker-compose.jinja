@@ -8,7 +8,7 @@ services:
                 condition: any
             placement:
                 constraints:
-                    - node.role == manager
+                    - node.role == worker
         healthcheck:
             test: ["CMD-SHELL", "pg_isready -U openbmp"]
             interval: 30s
@@ -100,7 +100,7 @@ services:
                 condition: none
             placement:
                 constraints:
-                    - node.role == manager
+                    - node.role == worker
         environment:
             HOST: {{ host }}
             OPENBMP_CONNECT: collector-{{ host | replace(".", "-") }}:5000
