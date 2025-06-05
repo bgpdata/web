@@ -166,9 +166,9 @@ def rib_task(queue, db, logger, events, memory):
             ]
             
             if Config.HOST == "route-views2":
-                index = f"https://archive.routeviews.org/bgpdata/{datetime.now().year}/{datetime.now().month:02d}/RIBS/"
+                index = f"https://archive.routeviews.org/bgpdata/{datetime.now().year}.{datetime.now().month:02d}/RIBS/"
             elif Config.HOST in inconsistent_hosts:
-                index = f"https://archive.routeviews.org/{Config.HOST}/bgpdata/{datetime.now().year}/{datetime.now().month:02d}/RIBS/"
+                index = f"https://archive.routeviews.org/{Config.HOST}/bgpdata/{datetime.now().year}.{datetime.now().month:02d}/RIBS/"
             else:
                 index = f"https://archive.routeviews.org/route-views.{Config.HOST}/bgpdata/{datetime.now().year}.{datetime.now().month:02d}/RIBS/"
 
