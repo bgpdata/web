@@ -252,7 +252,7 @@ services:
                 condition: any
             placement:
                 constraints:
-                    - node.role == manager
+                    - node.role == worker
         depends_on:
             - zookeeper
         volumes:
