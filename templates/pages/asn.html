@@ -6,7 +6,7 @@ AS{{ asn }}
 
 {% block headers %}
 <!-- IBM Carbon Components -->
-<script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.31.0/tabs.min.js"></script>
+<script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.31.0/dropdown.min.js"></script>
 <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.25.2/text-input.min.js"></script>
 <!-- IBM Carbon Charts -->
 <script src="https://cdn.jsdelivr.net/npm/@carbon/charts@1/dist/umd/bundle.umd.min.js"></script>
@@ -53,7 +53,50 @@ AS{{ asn }}
             <div class="wrapper__container">
                 <div class="container__content">
                     <div class="content__panel" id="overview" aria-labelledby="tab-overview">
-                        Tab Panel 1
+                        <div class="panel__header">
+                            <div class="header__description">
+                                Dashboards sections can be used to organize cards with related content, and they can be collapse for quicker navigation of dashboards that contain a lot of content.
+                            </div>
+                            <div class="header__controls">
+                                <cds-dropdown value="option-4" class="cds-theme-zone-white" size="lg" style="width: 18rem;">
+                                    <cds-dropdown-item value="option-0">Last 5 minutes</cds-dropdown-item>
+                                    <cds-dropdown-item value="option-1">Last 15 minutes</cds-dropdown-item>
+                                    <cds-dropdown-item value="option-2">Last 30 minutes</cds-dropdown-item>
+                                    <cds-dropdown-item value="option-3">Last 1 hour</cds-dropdown-item>
+                                    <cds-dropdown-item value="option-4">Last 3 hours</cds-dropdown-item>
+                                    <cds-dropdown-item value="option-5">Last 6 hours</cds-dropdown-item>
+                                    <cds-dropdown-item value="option-6">Last 12 hours</cds-dropdown-item>
+                                    <cds-dropdown-item value="option-7">Last 24 hours</cds-dropdown-item>
+                                    <cds-dropdown-item value="option-8">Last 2 days</cds-dropdown-item>
+                                    <cds-dropdown-item value="option-10">Last 7 days</cds-dropdown-item>
+                                    <cds-dropdown-item value="option-11">Last 30 days</cds-dropdown-item>
+                                </cds-dropdown>
+                            </div>
+                        </div>
+                        <div class="panel__content">
+                            <div class="content__metrics">
+                                <div class="metrics__card">
+                                    <div class="card__eyebrow">IPv4</div>
+                                    <div class="card__description">Advertised IPv4 Prefixes</div>
+                                    <div class="card__value">1351</div>
+                                </div>
+                                <div class="metrics__card">
+                                    <div class="card__eyebrow">IPv6</div>
+                                    <div class="card__description">Advertised IPv6 Prefixes</div>
+                                    <div class="card__value">0</div>
+                                </div>
+                                <div class="metrics__card">
+                                    <div class="card__eyebrow">Upstream ASNs</div>
+                                    <div class="card__description">Routes received from</div>
+                                    <div class="card__value">82</div>
+                                </div>
+                                <div class="metrics__card">
+                                    <div class="card__eyebrow">Downstream ASNs</div>
+                                    <div class="card__description">Routes provided to</div>
+                                    <div class="card__value">3</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="content__panel" id="prefixes" aria-labelledby="tab-prefixes">
                         Tab Panel 2
