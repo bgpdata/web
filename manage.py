@@ -107,7 +107,7 @@ def run(workers="1", host="localhost", port=8080, reload=False):
         from app import create_app
         app = create_app()
         # Use the built-in Flask development server which works with flask-sock
-        app.run(host=host, port=port, debug=True)
+        app.run(host=host, port=port, debug=True, extra_files=['templates/**/*.html', 'static/**/*.scss'])
     else:
         subprocess.run([
             "gunicorn", 

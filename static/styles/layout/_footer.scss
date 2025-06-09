@@ -5,79 +5,48 @@
     background-color: #13191f;
 
     .footer__content {
-        padding-top: 3rem;
         padding-right: 2.5rem;
         padding-left: 2.5rem;
         margin-right: auto;
         margin-left: auto;
         max-width: 80rem;
+
         display: flex;
+        flex-direction: row;
+        justify-content: space-between;
         align-items: center;
-        justify-content: center;
-        padding-bottom: 3rem;
-        border-bottom: 1px solid #525252;
+        column-gap: 1rem;
 
-        .content__logo {
-            margin-left: 20px;
-            height: 50px;
-        }
+        .content__navigation {
+            flex-grow: 1;
 
-        .content__about {
-            margin-left: 13%;
-            display: flex;
-            flex-direction: column;
-            flex: 0 0 70%;
-            max-width: 70%;
-            font-size: 0.825rem;
-            row-gap: 5px;
-
-            .about__title {
-                font-weight: 300;
-            }
-
-            .about__link {
-                text-decoration: none;
-                transition: color .1s linear;
+            .navigation__list {
                 display: flex;
-                font-weight: 300;
-                align-items: center;
+                width: 100%;
+                margin: 0;
+                padding: 1rem;
+                column-gap: 2rem;
+                list-style: none;
                 color: #c6c6c6;
-                cursor: pointer;
-                column-gap: 5px;
+                font-weight: 200;
 
-                &:hover {
-                    color: #ffffff;
+                .list__link {
+                    text-decoration: none;
+                    color: inherit;
+
+                    &:hover {
+                        color: #f5f5f5;
+                        text-decoration: underline;
+                    }
                 }
             }
         }
-    }
 
-    .footer__navigation {
-        padding-right: 2.5rem;
-        padding-left: 2.5rem;
-        margin-right: auto;
-        margin-left: auto;
-        max-width: 80rem;
-
-        .navigation__list {
-            display: flex;
-            width: 100%;
-            margin: 0;
-            padding: 1rem;
-            column-gap: 2rem;
-            list-style: none;
-            color: #c6c6c6;
-            font-weight: 200;
-
-            .list__link {
-                text-decoration: none;
-                color: inherit;
-
-                &:hover {
-                    color: #f5f5f5;
-                    text-decoration: underline;
-                }
-            }
+        .content__rate {
+            margin: auto 0;
+            font-weight: 250;
+            background: #2d2f31;
+            padding: 0.25rem 0.5rem;
         }
     }
 }

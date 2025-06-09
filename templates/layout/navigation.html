@@ -3,47 +3,41 @@
         <ul class="container__list">
             <!-- Menu items -->
             <li class="list__item">
-                <a class="item__link" href="/" aria-label="Boards">Boards</a>
+                <a class="item__link" href="/" aria-label="Home">Home</a>
             </li>
             <li class="list__item">
-                <a class="item__link" href="/latest" aria-label="Neueste">Neueste</a>
+                <a class="item__link" href="/top" aria-label="Top Prefixes">Top Prefixes</a>
             </li>
             <li class="list__item">
-                <a class="item__link" href="#" aria-label="Sicherheit">
-                    <span>Sicherheit</span>
+                <a class="item__link" href="#" aria-label="Collectors">
+                    <span>Collectors</span>
                     <i class="fa-sharp fa-light fa-angle-down"></i>
                 </a>
                 <ul class="item__dropdown">
                     <!-- Dropdown items -->
                     <li class="dropdown__item">
-                        <a class="item__link" href="/opsec" aria-label="OPSEC">OPSEC</a>
+                        <a class="item__link" href="/ris" aria-label="RIS">RIS</a>
                     </li>
                     <li class="dropdown__item">
-                        <a class="item__link" href="/tor" aria-label="Tor">Tor</a>
+                        <a class="item__link" href="/routeviews" aria-label="RouteViews">RouteViews</a>
                     </li>
                 </ul>
             </li>
             <li class="list__item">
-                <a class="item__link" href="/abbreviations" aria-label="Abkürzungen">Abkürzungen</a>
+                <a class="item__link" href="/looking-glass" aria-label="Looking Glass">Looking Glass</a>
             </li>
             <li class="list__item">
-                <a class="item__link" href="/grades" aria-label="Dienstgrade">Dienstgrade</a>
+                <a class="item__link" href="/whois" aria-label="Whois">Whois</a>
             </li>
             <li class="list__item">
-                <a class="item__link" href="/support" aria-label="Shop">
+                <a class="item__link" href="/support" aria-label="Support">
                     Support
                     <img src="{{ url_for('static', filename='images/link.svg') }}">
                 </a>
             </li>
             <li class="list__item">
-                <a class="item__link" href="/faq" aria-label="FAQ">FAQ</a>
+                <a class="item__link" href="/api" aria-label="API">API</a>
             </li>
-            {% if environment == 'development' %}
-            <li class="list__item">
-                <a class="item__link" href="/shop" aria-label="Shop">Shop</a>
-                </li>
-            {% endif %}
-            <!-- More menu items... -->
         </ul>
         <section class="container__actions">
             <a class="actions__button" href="/peer" aria-label="Peer with us">Peer with us</a>

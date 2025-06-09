@@ -1,12 +1,32 @@
 
 <footer id="footer">
-    <nav class="footer__navigation">
-        <ul class="navigation__list">
-            <li><a class="list__link" href="#">Contact</a></li>
-            <li><a class="list__link" href="#">Privacy Policy</a></li>
-            <li><a class="list__link" href="#">Terms of Service</a></li>
-            <li><a class="list__link" href="#">Accessibility</a></li>
-            <li><a class="list__link" href="https://status.superclustr.net">Statuspage</a></li>
-        </ul>
-    </nav>
+    <div class="footer__content">
+        <nav class="content__navigation">
+            <ul class="navigation__list">
+                <li><a class="list__link" href="#">Contact</a></li>
+                <li><a class="list__link" href="#">Privacy Policy</a></li>
+                <li><a class="list__link" href="#">Terms of Service</a></li>
+                <li><a class="list__link" href="#">Accessibility</a></li>
+                <li><a class="list__link" href="https://status.superclustr.net">Statuspage</a></li>
+            </ul>
+        </nav>
+        <div class="content__rate" id="rate">~0.00 kbit/s</div>
+    </div>
 </footer>
+{{ script('
+<script>
+    const socket = new WebSocket(`ws://${window.location.host}/ws/v1/rate`);
+
+    socket.onmessage = (event) => {
+        document.getElementById("rate").innerText = `~${event.data} kbit/s`;
+    };
+
+    socket.onerror = (error) => {
+        console.error("WebSocket error:", error);
+    };
+
+    socket.onclose = (event) => {
+        console.log("WebSocket connection closed:", event.code, event.reason);
+    };
+</script>
+') }}

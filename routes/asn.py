@@ -9,7 +9,6 @@ asn_blueprint = Blueprint('as', __name__)
 def asn(asn):
     try:
         as_name = "Example AS"
-        asn = "AS101"
 
     except Exception as e:
         app.logger.error(f"Failed to retrieve AS{asn}: {str(e)}")
