@@ -22,7 +22,7 @@ AS{{ asn }} {{ as_name }}
                     <a href="/" class="breadcrumbs__item">Home</a>
                 </div>
                 <h2 class="container__title" id="asn">
-                    AS{{ asn }}<span>&nbsp;-&nbsp;{{ as_name }}</span>
+                    AS{{ asn }} - {{ as_name }}
                 </h2>
             </div>
         </div>
@@ -90,12 +90,12 @@ AS{{ asn }} {{ as_name }}
                                 <div class="metrics__card">
                                     <div class="card__eyebrow">Upstream ASNs</div>
                                     <div class="card__description">Routes received from</div>
-                                    <div class="card__value">82</div>
+                                    <div class="card__value">{{ upstream_count }}</div>
                                 </div>
                                 <div class="metrics__card">
                                     <div class="card__eyebrow">Downstream ASNs</div>
                                     <div class="card__description">Routes provided to</div>
-                                    <div class="card__value">3</div>
+                                    <div class="card__value">{{ downstream_count }}</div>
                                 </div>
                             </div>
                         </div>

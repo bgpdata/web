@@ -29,13 +29,41 @@ def asn(asn):
             GROUP BY prefix
         """)
         
+        # Query for upstream ASNs
+        upstream_query = text("""
+            SELECT count(distinct asn) as count
+            FROM (
+                SELECT
+                    as_path[array_position(as_path, :asn) - 1] as asn
+                FROM base_attrs a
+                WHERE as_path && ARRAY[:asn]::bigint[]
+            ) d
+            WHERE asn is not null and asn != :asn
+        """)
+
+        # Query for downstream ASNs
+        downstream_query = text("""
+            SELECT count(distinct asn) as count
+            FROM (
+                SELECT
+                    as_path[(array_positions(as_path, :asn))[cardinality(array_positions(as_path, :asn))] + 1] as asn
+                FROM base_attrs a
+                WHERE as_path && ARRAY[:asn]::bigint[]
+            ) d
+            WHERE asn is not null
+        """)
+        
         # Execute queries
         ipv4_result = db.execute(ipv4_query, {"asn": asn})
         ipv6_result = db.execute(ipv6_query, {"asn": asn})
+        upstream_result = db.execute(upstream_query, {"asn": asn})
+        downstream_result = db.execute(downstream_query, {"asn": asn})
         
         # Calculate totals
         ipv4_count = sum(row[0] for row in ipv4_result.fetchall())
         ipv6_count = sum(row[0] for row in ipv6_result.fetchall())
+        upstream_count = upstream_result.scalar() or 0
+        downstream_count = downstream_result.scalar() or 0
         
         # Get AS name from info_asn table
         as_name_query = text("""
@@ -55,4 +83,6 @@ def asn(asn):
                          asn=asn, 
                          as_name=as_name,
                          ipv4_count=ipv4_count,
-                         ipv6_count=ipv6_count)
+                         ipv6_count=ipv6_count,
+                         upstream_count=upstream_count,
+                         downstream_count=downstream_count)

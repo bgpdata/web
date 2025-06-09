@@ -56,11 +56,6 @@
                     line-height: 120%;
                     letter-spacing: 0;
                     margin: 0;
-
-                    span {
-                        color: #8a8a8a;
-                        font-weight: 200;
-                    }
                 }
             }
         }
@@ -155,7 +150,7 @@
                     display: flex;
                     flex-direction: column;
                     width: 100%;
-                    padding: 2.25rem 1.5rem 2.25rem 2.5rem;
+                    padding: 2.25rem 2.5rem;
                     row-gap: 1rem;
 
                     .content__panel {
