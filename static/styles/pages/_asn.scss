@@ -231,12 +231,41 @@
                                 .charts__item {
                                     display: flex;
                                     flex-direction: column;
-                                    padding: 1rem;
+                                    padding: 1rem 1.25rem 1.25rem 1.25rem;
                                     min-height: 200px;
                                     justify-content: space-between;
                                     background: #f4f4f4;
                                     text-decoration: none;
                                     color: inherit;
+
+                                    .chart-grid-backdrop {
+                                        fill: none;
+                                    }
+
+                                    .cds--cc--title p.title {
+                                        font-weight: 400 !important;  
+                                    }
+                                    
+                                    .bx--cc--tooltip {
+                                        background-color: blue;
+                                    }
+
+                                    .cds--cc--legend {
+                                        column-gap: 0.5rem;
+
+                                        .legend-item .checkbox {
+                                            border-radius: 0;
+                                            border: none;
+                                            box-shadow: none;
+                                            width: 1rem;
+                                            height: 1rem;
+                                            margin-right: 0.5rem;
+    
+                                            svg {
+                                                margin: 2px 2.5px;
+                                            }
+                                        }
+                                    }
     
                                     @for $i from 1 through 3 {
                                         &--span-#{$i}-columns {

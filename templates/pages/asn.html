@@ -184,25 +184,23 @@ document.addEventListener('DOMContentLoaded', () => {
     new Charts.LineChart(document.getElementById("trend-graph"), {
         data,
         options: {
-            "title": 'Originating Prefix Trend',
-            "axes": {
-                "bottom": {
-                    "title": 'Time',
-                    "mapsTo": 'date',
-                    "scaleType": 'time'
+            title: 'Originating Prefix Trend',
+            axes: {
+                bottom: {
+                    title: 'Time',
+                    mapsTo: 'date',
+                    scaleType: 'time'
                 },
-                "left": {
-                    "mapsTo": 'value',
-                    "title": 'Count',
-                    "scaleType": 'linear'
+                left: {
+                    mapsTo: 'value',
+                    title: 'Prefixes',
+                    scaleType: 'linear'
                 }
             },
-            "curve": 'curveMonotoneX',
-            "height": '400px',
-            "theme": "white",
-            "color": {
-                "scale": {
-                    "IPv4 Prefixes": "#1c486f",
+            height: '400px',
+            color: {
+                scale: {
+                    "IPv4 Prefixes": "#204ff5",
                     "IPv6 Prefixes": "#c7c7c7",
                     "IPv4 with RPKI": "#1c486f",
                     "IPv6 with RPKI": "#c7c7c7",
