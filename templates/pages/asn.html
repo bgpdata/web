@@ -99,7 +99,8 @@ AS{{ asn }} {{ as_name }}
                                 </div>
                             </div>
                             <div class="content__charts">
-                                <div class="charts__item charts__item--span-3-columns" id="trend-graph"></div>
+                                <div class="charts__item charts__item--span-11-columns" id="trend-graph"></div>
+                                <div class="charts__item charts__item--span-5-columns" id="ips-graph"></div>
                             </div>
                         </div>
                     </div>
@@ -179,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
         { date: item.time, value: item.v4_with_irr, group: 'IPv4 with IRR' },
         { date: item.time, value: item.v6_with_irr, group: 'IPv6 with IRR' }
     ]);
-    console.log(data);
     // Grab chart holder HTML element and initialize the chart
     new Charts.LineChart(document.getElementById("trend-graph"), {
         data,
@@ -201,11 +201,36 @@ document.addEventListener('DOMContentLoaded', () => {
             color: {
                 scale: {
                     "IPv4 Prefixes": "#204ff5",
-                    "IPv6 Prefixes": "#c7c7c7",
-                    "IPv4 with RPKI": "#1c486f",
-                    "IPv6 with RPKI": "#c7c7c7",
-                    "IPv4 with IRR": "#1c486f",
-                    "IPv6 with IRR": "#c7c7c7"
+                    "IPv6 Prefixes": "#9489ff",
+                    "IPv4 with RPKI": "#4abea0",
+                    "IPv6 with RPKI": "#1c1a27",
+                    "IPv4 with IRR": "#1292e8",
+                    "IPv6 with IRR": "#a3b2b9"
+                }
+            }
+        }
+    });
+</script>
+<script>
+    // Grab chart holder HTML element and initialize the chart
+    new Charts.PieChart(document.getElementById("ips-graph"), {
+        data: [
+            {
+                group: 'IPv4',
+                value: {{ ipv4_count }}
+            },
+            {
+                group: 'IPv6',
+                value: {{ ipv6_count }}
+            }
+        ],
+        options: {
+            title: 'Advertised IP Addresses',
+            height: '400px',
+            color: {
+                scale: {
+                    "IPv4": "#204ff5",
+                    "IPv6": "#a3b2b9"
                 }
             }
         }
