@@ -8,6 +8,7 @@ AS{{ asn }} {{ as_name }}
 <!-- IBM Carbon Components -->
 <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.31.0/dropdown.min.js"></script>
 <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.25.2/text-input.min.js"></script>
+<script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.31.0/data-table.min.js"></script>
 <!-- IBM Carbon Charts -->
 <script src="https://cdn.jsdelivr.net/npm/@carbon/charts@1/dist/umd/bundle.umd.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/@carbon/charts@1/styles.min.css" rel="stylesheet">
@@ -101,6 +102,43 @@ AS{{ asn }} {{ as_name }}
                             <div class="content__charts">
                                 <div class="charts__item charts__item--span-11-columns" id="trend-graph"></div>
                                 <div class="charts__item charts__item--span-5-columns" id="ips-graph"></div>
+                            </div>
+                            <div class="content__tables">
+                                <cds-table class="cds-theme-zone-white" with-header="true" expandable="true">
+                                    <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
+                                        ASN Information
+                                    </cds-table-header-title>
+                                    <cds-table-header-description slot="description" style="font-weight: 250; font-size: 1rem; margin-bottom: -0.5rem;">
+                                        Information from various public datasets
+                                    </cds-table-header-description>
+                                    <cds-table-head>
+                                        <cds-table-header-row>
+                                            <cds-table-header-cell>AS Name</cds-table-header-cell>
+                                            <cds-table-header-cell>Org Id</cds-table-header-cell>
+                                            <cds-table-header-cell>Org Name</cds-table-header-cell>
+                                            <cds-table-header-cell>Address</cds-table-header-cell>
+                                            <cds-table-header-cell>City</cds-table-header-cell>
+                                            <cds-table-header-cell>State/Prov</cds-table-header-cell>
+                                            <cds-table-header-cell>Country</cds-table-header-cell>
+                                            <cds-table-header-cell>Source</cds-table-header-cell>
+                                        </cds-table-header-row>
+                                    </cds-table-head>
+                                    <cds-table-body>
+                                        <cds-table-row>
+                                            <cds-table-cell>{{ asn_info.as_name }}</cds-table-cell>
+                                            <cds-table-cell>{{ asn_info.org_id }}</cds-table-cell>
+                                            <cds-table-cell>{{ asn_info.org_name }}</cds-table-cell>
+                                            <cds-table-cell>{{ asn_info.address }}</cds-table-cell>
+                                            <cds-table-cell>{{ asn_info.city }}</cds-table-cell>
+                                            <cds-table-cell>{{ asn_info.state_prov }}</cds-table-cell>
+                                            <cds-table-cell>{{ asn_info.country }}</cds-table-cell>
+                                            <cds-table-cell>{{ asn_info.source }}</cds-table-cell>
+                                        </cds-table-row>
+                                        <cds-table-expanded-row>
+                                            <div style="padding: 1.5rem 0;">{{ asn_info.remarks }}</div>
+                                        </cds-table-expanded-row>
+                                    </cds-table-body>
+                                </cds-table>
                             </div>
                         </div>
                     </div>

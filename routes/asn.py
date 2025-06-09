@@ -70,6 +70,23 @@ def asn(asn):
             ORDER BY interval_time ASC
         """)
         
+        # Query for ASN Info
+        asn_info_query = text("""
+            SELECT 
+                as_name,
+                org_id,
+                org_name,
+                address,
+                city,
+                state_prov,
+                country,
+                remarks,
+                raw_output,
+                source
+            FROM info_asn
+            WHERE asn = :asn
+        """)
+        
         # Execute queries
         ipv4_result = db.execute(ipv4_query, {"asn": asn})
         ipv6_result = db.execute(ipv6_query, {"asn": asn})
@@ -82,6 +99,10 @@ def asn(asn):
             "asn": asn,
             "start_time": start_time
         })
+        
+        # Get ASN Info
+        asn_info_result = db.execute(asn_info_query, {"asn": asn})
+        asn_info = asn_info_result.fetchone()
         
         # Process trend data
         trend_data = []
@@ -102,25 +123,32 @@ def asn(asn):
         upstream_count = upstream_result.scalar() or 0
         downstream_count = downstream_result.scalar() or 0
         
-        # Get AS name from info_asn table
-        as_name_query = text("""
-            SELECT as_name 
-            FROM info_asn 
-            WHERE asn = :asn
-        """)
-        as_name_result = db.execute(as_name_query, {"asn": asn})
-        as_name_row = as_name_result.fetchone()
-        as_name = as_name_row[0] if as_name_row else f"AS{asn}"
+        # Process ASN Info
+        asn_info_dict = {
+            'as_name': asn_info[0] if asn_info else None,
+            'org_id': asn_info[1] if asn_info else None,
+            'org_name': asn_info[2] if asn_info else None,
+            'address': asn_info[3] if asn_info else None,
+            'city': asn_info[4] if asn_info else None,
+            'state_prov': asn_info[5] if asn_info else None,
+            'country': asn_info[6] if asn_info else None,
+            'remarks': asn_info[7] if asn_info else None,
+            'raw_output': asn_info[8] if asn_info else None,
+            'source': asn_info[9] if asn_info else None
+        }
 
     except Exception as e:
         app.logger.error(f"Failed to retrieve AS{asn}: {str(e)}")
         return abort(500, description="An error occurred")
 
-    return render_template('pages/asn.html', 
-                         asn=asn, 
-                         as_name=as_name,
-                         ipv4_count=ipv4_count,
-                         ipv6_count=ipv6_count,
-                         upstream_count=upstream_count,
-                         downstream_count=downstream_count,
-                         trend_data=trend_data)
+    return render_template(
+        'pages/asn.html', 
+        asn=asn, 
+        as_name=asn_info_dict['as_name'] or f"AS{asn}",
+        ipv4_count=ipv4_count,
+        ipv6_count=ipv6_count,
+        upstream_count=upstream_count,
+        downstream_count=downstream_count,
+        trend_data=trend_data,
+        asn_info=asn_info_dict
+    )
