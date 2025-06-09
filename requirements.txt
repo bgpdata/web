@@ -21,3 +21,4 @@ confluent-kafka==2.5.3
 rocksdb-py==0.0.5
 scapy==2.6.1
 SQLAlchemy==2.0.36
+psycopg2-binary==2.9.10

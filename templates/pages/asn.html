@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-AS{{ asn }}
+AS{{ asn }} {{ as_name }}
 {% endblock %}
 
 {% block headers %}
@@ -21,7 +21,9 @@ AS{{ asn }}
                 <div class="container__breadcrumbs">
                     <a href="/" class="breadcrumbs__item">Home</a>
                 </div>
-                <h2 class="container__title" id="asn">AS{{ asn }}</h2>
+                <h2 class="container__title" id="asn">
+                    AS{{ asn }}<span>&nbsp;-&nbsp;{{ as_name }}</span>
+                </h2>
             </div>
         </div>
     </div>
@@ -78,12 +80,12 @@ AS{{ asn }}
                                 <div class="metrics__card">
                                     <div class="card__eyebrow">IPv4</div>
                                     <div class="card__description">Advertised IPv4 Prefixes</div>
-                                    <div class="card__value">1351</div>
+                                    <div class="card__value">{{ ipv4_count }}</div>
                                 </div>
                                 <div class="metrics__card">
                                     <div class="card__eyebrow">IPv6</div>
                                     <div class="card__description">Advertised IPv6 Prefixes</div>
-                                    <div class="card__value">0</div>
+                                    <div class="card__value">{{ ipv6_count }}</div>
                                 </div>
                                 <div class="metrics__card">
                                     <div class="card__eyebrow">Upstream ASNs</div>
