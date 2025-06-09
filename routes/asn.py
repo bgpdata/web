@@ -3,10 +3,10 @@ from utils.database import PostgreSQL
 from sqlalchemy import text
 
 # Create Blueprint
-asn_blueprint = Blueprint('asn', __name__)
+asn_blueprint = Blueprint('as', __name__)
 
 @asn_blueprint.route("/<int:asn>")
-async def asn(asn):
+def asn(asn):
     try:
         as_name = "Example AS"
         asn = "AS101"

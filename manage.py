@@ -103,24 +103,18 @@ def run(workers="1", host="localhost", port=8080, reload=False):
     MainConfig.validate()
 
     if reload:
-        subprocess.run([
-            "uvicorn",
-            "app:asgi_app",
-            "--host", host,
-            "--port", str(port),
-            "--reload",
-            "--reload-dir", ".",
-            "--reload-delay", "0.25",
-            "--log-level", "debug"
-        ], cwd=os.path.dirname(os.path.abspath(__file__)))
+        # Get the app instance
+        from app import create_app
+        app = create_app()
+        # Use the built-in Flask development server which works with flask-sock
+        app.run(host=host, port=port, debug=True)
     else:
         subprocess.run([
             "gunicorn", 
             "--bind", f"{host}:{port}", 
             "--workers", workers,
-            "--worker-class", "uvicorn.workers.UvicornWorker",
-            "--env", "GUNICORN_WORKER_ID=${GUNICORN_WORKER_ID:-0}",
-            "app:asgi_app"
+            "--worker-class", "gevent",
+            "app:app"
         ])
 
 def main():

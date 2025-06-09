@@ -2,7 +2,7 @@ import os
 
 class BaseConfig:
     ENVIRONMENT = os.getenv('ENVIRONMENT', 'development').lower()
-    LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
+    LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO' if ENVIRONMENT == 'production' else 'DEBUG').upper()
 
 class MainConfig(BaseConfig):
     # Flask

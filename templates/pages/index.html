@@ -112,14 +112,14 @@ BGPDATA
 
         
         myAsn.innerText = `AS${asn}`;
-        myAsn.href = `/asn/${asn}`;
+        myAsn.href = `/as/${asn}`;
         myPrefix.innerText = prefix;
         myPrefix.href = `/prefix/${prefix}`;
 
         randomIpv4Prefix.href = `/prefix/${asn.prefix}`;
         randomIpv4Range.href = `/range/${prefix}`;
         randomIpv6.href = `/prefix/${prefix}`;
-        randomAsn.href = `/asn/${asn}`;
+        randomAsn.href = `/as/${asn}`;
     });
 </script>
 {% endblock %}

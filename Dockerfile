@@ -19,6 +19,13 @@ RUN apt-get install -y software-properties-common gnupg && \
     apt-get update && \
     apt-get install -y librocksdb-dev
 
+# Install Java
+RUN apt-get update && \
+    apt-get install -y wget gnupg && \
+    echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list && \
+    apt-get update && \
+    apt-get install -y openjdk-11-jre
+
 # Clean up
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*

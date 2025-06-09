@@ -4,7 +4,8 @@ from flask_compress import Compress
 from config import MainConfig as Config
 from flask_cors import CORS
 from flask_talisman import Talisman
-from asgiref.wsgi import WsgiToAsgi
+from utils.socket import sock, WebSocketBroadcaster
+from utils.kafka import get_kafka_ingest_rate
 from utils.scheduler import scheduler
 from utils.cache import cache, caching
 from utils.limiter import limiter
@@ -58,8 +59,14 @@ def create_app():
     else:
         app.logger.setLevel(logging.DEBUG)
 
+    # Initialize sock
+    sock.init_app(app)
+
     # Initialize cache
     cache.init_app(app, config={'CACHE_TYPE': 'simple'})
+
+    # Set socket configuration
+    app.config["SOCK_SERVER_OPTIONS"] = {"ping_interval": 25}
 
     # Set secure session cookies
     app.config['SESSION_COOKIE_SECURE'] = app.config['ENVIRONMENT'] == 'production'
@@ -75,11 +82,11 @@ def create_app():
         re.compile(r'^https?://100\.\d+\.\d+\.\d+(?::\d+)?(?:/.*)?$') # VPN 100.x.x.x
     ]
 
-    CORS(
-        app,
-        resources={r"/api/*": {"origins": cors_origin}},
-        supports_credentials=True,
-    )
+    #CORS(
+    #    app,
+    #    resources={r"/*": {"origins": cors_origin}},
+    #    supports_credentials=True,
+    #)
 
     # Initialize Flask-Talisman
     if app.config['ENVIRONMENT'] == 'production':
@@ -109,7 +116,7 @@ def create_app():
     if app.config['ENVIRONMENT'] == 'development':
         app.before_request(before_request)
     
-    
+
     """
     Jinja
     """
@@ -129,6 +136,7 @@ def create_app():
             scripts.append(script)
             return ''
         return dict(script=script, environment=app.config['ENVIRONMENT'], i18n=i18n, scripts=lambda: scripts)
+    
 
     """
     Scheduler
@@ -137,7 +145,7 @@ def create_app():
     # Initialize scheduler
     scheduler.init_app(app)
 
-    scheduler.add_job(id='example_job', func=example_job, priority=0, days=30)
+    #scheduler.add_job(id='example_job', func=example_job, priority=0, days=30)
 
     # Register scheduler shutdown
     atexit.register(lambda: scheduler.shutdown(wait=False))
@@ -203,6 +211,21 @@ def create_app():
 
 
     """
+    WebSockets
+    """
+
+    ingest_rate_broadcaster = WebSocketBroadcaster(get_kafka_ingest_rate)
+
+    @sock.route('/ws/v1/rate')
+    def ws_v1_rate(ws):
+        try:
+            app.logger.info("WebSocket connected")
+            ingest_rate_broadcaster.register(ws)
+        except Exception as e:
+            app.logger.error("WebSocket error: %s", str(e), exc_info=True)
+
+
+    """
     Basic
     """
 
@@ -221,9 +244,9 @@ def create_app():
 
 
     # Register Blueprints
-    app.register_blueprint(asn_blueprint, url_prefix='/asn')
+    app.register_blueprint(asn_blueprint, url_prefix='/as')
 
     return app
 
-# Create the ASGI app
-asgi_app = WsgiToAsgi(create_app())
+# Create the app
+app = create_app()

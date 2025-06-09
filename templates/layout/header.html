@@ -18,26 +18,29 @@
 
         <!-- Actions -->
         <div class="container__actions">
+            <!-- Data Rate -->
+            <div class="actions__rate" id="rate">~0.00 kbit/s</div>
             <!-- Actions Buttons -->
-            {% if request.path.startswith('/shop') %}
-            <a class="actions__button" href="/shop/cart">
-                <i class="fa-sharp fa-light fa-cart-shopping"></i>
-            </a>
-            {% endif %}
-            {% if profile %}
-            <button 
-                class="actions__button" 
-                onclick="toggleNotifications()"
-            >
-                <i class="fa-sharp fa-light fa-message-middle"></i>
-                {% if profile["notifications_count"] > 0 %}
-                <span class="button__indicator"></span>
-                {% endif %}
-            </button>
-            {% endif %}
             <a class="actions__button" href="{% if profile is none %}/login{% else %}/account{% endif %}">
                 <i class="fa-sharp fa-light fa-user"></i>
             </a>
         </div>
     </div>
 </header>
+{{ script('
+<script>
+    const socket = new WebSocket(`ws://${window.location.host}/ws/v1/rate`);
+
+    socket.onmessage = (event) => {
+        document.getElementById("rate").innerText = `~${event.data} kbit/s`;
+    };
+
+    socket.onerror = (error) => {
+        console.error("WebSocket error:", error);
+    };
+
+    socket.onclose = (event) => {
+        console.log("WebSocket connection closed:", event.code, event.reason);
+    };
+</script>
+') }}

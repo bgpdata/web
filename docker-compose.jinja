@@ -112,7 +112,7 @@ services:
             {%- endif %}
             - relay_{{ host | replace(".", "_") | replace("-", "_") }}_data:/var/lib/rocksdb
         entrypoint: >
-            bash -c "sleep $$(({{ loop.index0 }} * {{ delay }})) && python manage.py relay"
+            bash -c "sleep $$(({{ loop.index0 + 1 }} * {{ delay }})) && python manage.py relay"
     {% endfor %}
     
     {%- for host in ris + routeviews %}
@@ -274,6 +274,14 @@ services:
             KAFKA_LOG_SEGMENT_BYTES: 1073741824
             KAFKA_MESSAGE_MAX_BYTES: 100000000
             KAFKA_LOG_CLEANER_THREADS: 2
+            KAFKA_JMX_PORT: 9999
+            KAFKA_JMX_OPTS: >-
+                -Dcom.sun.management.jmxremote=true
+                -Dcom.sun.management.jmxremote.local.only=false
+                -Dcom.sun.management.jmxremote.ssl=false
+                -Dcom.sun.management.jmxremote.authenticate=false
+                -Djava.rmi.server.hostname=kafka
+                -Dcom.sun.management.jmxremote.rmi.port=9999
 
     {%- if not production %}
     grafana:
