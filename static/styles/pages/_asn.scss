@@ -184,6 +184,7 @@
                                 display: flex;
                                 flex-direction: row;
                                 flex-wrap: nowrap;
+                                margin-bottom: 1.5rem;
 
                                 .metrics__card {
                                     display: flex;
@@ -216,6 +217,37 @@
                                         font-weight: 350;
                                         line-height: 1;
                                         letter-spacing: 0;
+                                    }
+                                }
+                            }
+
+                            .content__charts {
+                                width: 100%;
+                                display: grid;
+                                grid-template-columns: repeat(4, 1fr);
+                                grid-auto-rows: minmax(200px, auto);
+                                gap: 1.5rem;
+    
+                                .charts__item {
+                                    display: flex;
+                                    flex-direction: column;
+                                    padding: 1rem;
+                                    min-height: 200px;
+                                    justify-content: space-between;
+                                    background: #f4f4f4;
+                                    text-decoration: none;
+                                    color: inherit;
+    
+                                    @for $i from 1 through 3 {
+                                        &--span-#{$i}-columns {
+                                            grid-column: span $i;
+                                        }
+                                    }
+    
+                                    @for $i from 1 through 2 {
+                                        &--span-#{$i}-rows {
+                                            grid-row: span $i;
+                                        }
                                     }
                                 }
                             }

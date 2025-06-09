@@ -98,6 +98,9 @@ AS{{ asn }} {{ as_name }}
                                     <div class="card__value">{{ downstream_count }}</div>
                                 </div>
                             </div>
+                            <div class="content__charts">
+                                <div class="charts__item charts__item--span-3-columns" id="trend-graph"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="content__panel" id="prefixes" aria-labelledby="tab-prefixes">
@@ -166,5 +169,48 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial load
     handleHashChange();
 });
+</script>
+<script>
+    const data = {{ trend_data|tojson }}.flatMap(item => [
+        { date: item.time, value: item.v4_prefixes, group: 'IPv4 Prefixes' },
+        { date: item.time, value: item.v6_prefixes, group: 'IPv6 Prefixes' },
+        { date: item.time, value: item.v4_with_rpki, group: 'IPv4 with RPKI' },
+        { date: item.time, value: item.v6_with_rpki, group: 'IPv6 with RPKI' },
+        { date: item.time, value: item.v4_with_irr, group: 'IPv4 with IRR' },
+        { date: item.time, value: item.v6_with_irr, group: 'IPv6 with IRR' }
+    ]);
+    console.log(data);
+    // Grab chart holder HTML element and initialize the chart
+    new Charts.LineChart(document.getElementById("trend-graph"), {
+        data,
+        options: {
+            "title": 'Originating Prefix Trend',
+            "axes": {
+                "bottom": {
+                    "title": 'Time',
+                    "mapsTo": 'date',
+                    "scaleType": 'time'
+                },
+                "left": {
+                    "mapsTo": 'value',
+                    "title": 'Count',
+                    "scaleType": 'linear'
+                }
+            },
+            "curve": 'curveMonotoneX',
+            "height": '400px',
+            "theme": "white",
+            "color": {
+                "scale": {
+                    "IPv4 Prefixes": "#1c486f",
+                    "IPv6 Prefixes": "#c7c7c7",
+                    "IPv4 with RPKI": "#1c486f",
+                    "IPv6 with RPKI": "#c7c7c7",
+                    "IPv4 with IRR": "#1c486f",
+                    "IPv6 with IRR": "#c7c7c7"
+                }
+            }
+        }
+    });
 </script>
 {% endblock %}
