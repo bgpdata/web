@@ -15,7 +15,7 @@
 </footer>
 {{ script('
 <script>
-    const socket = new WebSocket(`ws://${window.location.host}/ws/v1/rate`);
+    const socket = new WebSocket(`${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/ws/v1/rate`);
 
     socket.onmessage = (event) => {
         document.getElementById("rate").innerText = `~${event.data} kbit/s`;
