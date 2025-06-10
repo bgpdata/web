@@ -1,8 +1,8 @@
 
 #footer {
-    color: #f5f5f5;
+    color: #f4f4f4;
     margin-top: auto;
-    background-color: #13191f;
+    background-color: #161616;
 
     .footer__content {
         padding-right: 2.5rem;
@@ -35,7 +35,7 @@
                     color: inherit;
 
                     &:hover {
-                        color: #f5f5f5;
+                        color: #f4f4f4;
                         text-decoration: underline;
                     }
                 }
@@ -45,7 +45,7 @@
         .content__rate {
             margin: auto 0;
             font-weight: 200;
-            color: #f5f5f5;
+            color: #f4f4f4;
         }
     }
 }

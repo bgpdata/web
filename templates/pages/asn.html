@@ -61,7 +61,7 @@ AS{{ asn }} {{ as_name }}
                                 Dashboards sections can be used to organize cards with related content, and they can be collapse for quicker navigation of dashboards that contain a lot of content.
                             </div>
                             <div class="header__controls">
-                                <cds-dropdown value="option-4" class="cds-theme-zone-white" size="lg" style="width: 18rem;">
+                                <cds-dropdown value="option-4" class="cds-theme-zone-white" size="lg" style="width: 18rem; font-size: 1rem; font-weight: 350;">
                                     <cds-dropdown-item value="option-0">Last 5 minutes</cds-dropdown-item>
                                     <cds-dropdown-item value="option-1">Last 15 minutes</cds-dropdown-item>
                                     <cds-dropdown-item value="option-2">Last 30 minutes</cds-dropdown-item>
@@ -104,7 +104,7 @@ AS{{ asn }} {{ as_name }}
                                 <div class="charts__item charts__item--span-5-columns" id="ips-graph"></div>
                             </div>
                             <div class="content__tables">
-                                <cds-table class="cds-theme-zone-white" with-header="true" expandable="true">
+                                <cds-table class="tables__item tables__item--span-16-columns cds-theme-zone-white" with-header="true" {% if asn_info.remarks %}expandable="true"{% endif %} size="lg">
                                     <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
                                         ASN Information
                                     </cds-table-header-title>
@@ -124,19 +124,63 @@ AS{{ asn }} {{ as_name }}
                                         </cds-table-header-row>
                                     </cds-table-head>
                                     <cds-table-body>
-                                        <cds-table-row>
+                                        <cds-table-row {% if asn_info.remarks %}expanded="true"{% endif %}>
                                             <cds-table-cell>{{ asn_info.as_name }}</cds-table-cell>
                                             <cds-table-cell>{{ asn_info.org_id }}</cds-table-cell>
                                             <cds-table-cell>{{ asn_info.org_name }}</cds-table-cell>
-                                            <cds-table-cell>{{ asn_info.address }}</cds-table-cell>
+                                            <cds-table-cell>{% if asn_info.address == ', ' %}{% else %}{{ asn_info.address }}{% endif %}</cds-table-cell>
                                             <cds-table-cell>{{ asn_info.city }}</cds-table-cell>
                                             <cds-table-cell>{{ asn_info.state_prov }}</cds-table-cell>
                                             <cds-table-cell>{{ asn_info.country }}</cds-table-cell>
                                             <cds-table-cell>{{ asn_info.source }}</cds-table-cell>
                                         </cds-table-row>
                                         <cds-table-expanded-row>
-                                            <div style="padding: 1.5rem 0;">{{ asn_info.remarks }}</div>
+                                            <div style="padding: 1.5rem 1.5rem 1.5rem 0;">{{ asn_info.remarks }}</div>
                                         </cds-table-expanded-row>
+                                    </cds-table-body>
+                                </cds-table>
+                                <cds-table class="tables__item tables__item--span-8-columns cds-theme-zone-white" with-header="true" {% if asn_info.remarks %}expandable="true"{% endif %} size="lg">
+                                    <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
+                                        Upstream ASNs
+                                    </cds-table-header-title>
+                                    <cds-table-header-description slot="description" style="font-weight: 250; font-size: 1rem; margin-bottom: -0.5rem;">
+                                        ASNs that have routes to this ASN
+                                    </cds-table-header-description>
+                                    <cds-table-head>
+                                        <cds-table-header-row>
+                                            <cds-table-header-cell>ASN</cds-table-header-cell>
+                                            <cds-table-header-cell>Name</cds-table-header-cell>
+                                        </cds-table-header-row>
+                                    </cds-table-head>
+                                    <cds-table-body>
+                                        {% for upstream_asn in upstream_asns %}
+                                        <cds-table-row>
+                                            <cds-table-cell>{{ upstream_asn.asn }}</cds-table-cell>
+                                            <cds-table-cell>{{ upstream_asn.name }}</cds-table-cell>
+                                        </cds-table-row>
+                                        {% endfor %}
+                                    </cds-table-body>
+                                </cds-table>
+                                <cds-table class="tables__item tables__item--span-8-columns cds-theme-zone-white" with-header="true" {% if asn_info.remarks %}expandable="true"{% endif %} size="lg">
+                                    <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
+                                        Downstream ASNs
+                                    </cds-table-header-title>
+                                    <cds-table-header-description slot="description" style="font-weight: 250; font-size: 1rem; margin-bottom: -0.5rem;">
+                                        ASNs that this ASN has routes to
+                                    </cds-table-header-description>
+                                    <cds-table-head>
+                                        <cds-table-header-row>
+                                            <cds-table-header-cell>ASN</cds-table-header-cell>
+                                            <cds-table-header-cell>Name</cds-table-header-cell>
+                                        </cds-table-header-row>
+                                    </cds-table-head>
+                                    <cds-table-body>
+                                        {% for downstream_asn in downstream_asns %}
+                                        <cds-table-row>
+                                            <cds-table-cell>{{ downstream_asn.asn }}</cds-table-cell>
+                                            <cds-table-cell>{{ downstream_asn.name }}</cds-table-cell>
+                                        </cds-table-row>
+                                        {% endfor %}
                                     </cds-table-body>
                                 </cds-table>
                             </div>
@@ -167,7 +211,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to switch tabs
     const switchTab = (targetId) => {
         // Update URL hash without triggering scroll
-        history.replaceState(null, null, `#${targetId}`);
+        if (targetId !== 'overview') {
+            history.replaceState(null, null, `#${targetId}`);
+        } else {
+            history.replaceState(null, null, window.location.pathname);
+        }
         
         // Update active tab
         tabs.forEach(tab => {
@@ -239,11 +287,11 @@ document.addEventListener('DOMContentLoaded', () => {
             color: {
                 scale: {
                     "IPv4 Prefixes": "#204ff5",
-                    "IPv6 Prefixes": "#9489ff",
+                    "IPv6 Prefixes": "#d82e8a",
                     "IPv4 with RPKI": "#4abea0",
-                    "IPv6 with RPKI": "#1c1a27",
-                    "IPv4 with IRR": "#1292e8",
-                    "IPv6 with IRR": "#a3b2b9"
+                    "IPv6 with RPKI": "#ffde02",
+                    "IPv4 with IRR": "#a3b2b9",
+                    "IPv6 with IRR": "#161616"
                 }
             }
         }

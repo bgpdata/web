@@ -239,8 +239,14 @@
                                     text-decoration: none;
                                     color: inherit;
 
-                                    .chart-grid-backdrop {
-                                        fill: none;
+                                    .cds--cc--chart-wrapper {
+                                        svg.layout-svg-wrapper {
+                                            cursor: crosshair;
+
+                                            .chart-grid-backdrop {
+                                                fill: none;
+                                            }
+                                        }
                                     }
 
                                     .cds--cc--title p.title {
@@ -251,7 +257,8 @@
                                         background-color: blue;
                                     }
 
-                                    .cds--cc--scatter circle.dot.unfilled {
+                                    .cds--cc--scatter circle.dot.unfilled,
+                                    .cds--cc--scatter circle.dot.hovered {
                                         r: 4 !important;
                                     }
 
@@ -272,6 +279,28 @@
                                         }
                                     }
     
+                                    @for $i from 1 through 16 {
+                                        &--span-#{$i}-columns {
+                                            grid-column: span $i;
+                                        }
+                                    }
+    
+                                    @for $i from 1 through 16 {
+                                        &--span-#{$i}-rows {
+                                            grid-row: span $i;
+                                        }
+                                    }
+                                }
+                            }
+
+                            .content__tables {
+                                width: 100%;
+                                display: grid;
+                                grid-template-columns: repeat(16, 1fr);
+                                grid-auto-rows: minmax(200px, auto);
+                                gap: 1.5rem;
+
+                                .tables__item {
                                     @for $i from 1 through 16 {
                                         &--span-#{$i}-columns {
                                             grid-column: span $i;
