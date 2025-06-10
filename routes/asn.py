@@ -187,7 +187,7 @@ def asn(asn):
     return render_template(
         'pages/asn.html', 
         asn=asn, 
-        as_name=asn_info_dict['as_name'] or f"AS{asn}",
+        as_name=asn_info_dict['as_name'],
         ipv4_count=ipv4_count,
         ipv6_count=ipv6_count,
         upstream_count=upstream_count,

@@ -23,7 +23,7 @@ AS{{ asn }} {{ as_name }}
                     <a href="/" class="breadcrumbs__item">Home</a>
                 </div>
                 <h2 class="container__title" id="asn">
-                    AS{{ asn }} - {{ as_name }}
+                    AS{{ asn }}{% if as_name %}&nbsp;-&nbsp;{{ as_name }}{% endif %}
                 </h2>
             </div>
         </div>
