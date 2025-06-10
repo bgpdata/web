@@ -41,8 +41,8 @@ AS{{ asn }} {{ as_name }}
                     <div class="tab__item" target="connectivity">
                         Connectivity
                     </div>
-                    <div class="tab__item" target="measurements">
-                        Measurements
+                    <div class="tab__item" target="activity">
+                        Activity
                     </div>
                     <div class="tab__item" target="whois">
                         Whois
@@ -184,12 +184,71 @@ AS{{ asn }} {{ as_name }}
                         </div>
                     </div>
                     <div class="content__panel" id="prefixes" aria-labelledby="tab-prefixes">
-                        Tab Panel 2
+                        <div class="panel__content">
+                            <div class="content__tables">
+                                <cds-table class="tables__item tables__item--span-16-columns cds-theme-zone-white" with-header="true">
+                                    <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
+                                        Aggregates
+                                    </cds-table-header-title>
+                                    <cds-table-header-description slot="description" style="font-weight: 250; font-size: 1rem; margin-bottom: -0.5rem;">
+                                        All prefixes advertised by this ASN
+                                    </cds-table-header-description>
+                                    <cds-table-head>
+                                        <cds-table-header-row>
+                                            <cds-table-header-cell>Prefix</cds-table-header-cell>
+                                        </cds-table-header-row>
+                                    </cds-table-head>
+                                    <cds-table-body>
+                                        {% for prefix in prefixes_aggregates %}
+                                        <cds-table-row>
+                                            <cds-table-cell>{{ prefix }}</cds-table-cell>
+                                        </cds-table-row>
+                                        {% endfor %}
+                                    </cds-table-body>
+                                </cds-table>
+
+                                <cds-table class="tables__item tables__item--span-16-columns cds-theme-zone-white" with-header="true">
+                                    <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
+                                        Advertised Prefixes
+                                    </cds-table-header-title>
+                                    <cds-table-header-description slot="description" style="font-weight: 250; font-size: 1rem; margin-bottom: -0.5rem;">
+                                        All prefixes advertised by this ASN, including multiple entries from IRR databases
+                                    </cds-table-header-description>
+                                    <cds-table-toolbar slot="toolbar">
+                                        <cds-table-toolbar-content ?has-batch-actions="true">
+                                            <cds-table-toolbar-search placeholder="Filter prefixes" expanded></cds-table-toolbar-search>
+                                        </cds-table-toolbar-content>
+                                    </cds-table-toolbar>
+                                    <cds-table-head>
+                                        <cds-table-header-row>
+                                            <cds-table-header-cell>Prefix</cds-table-header-cell>
+                                            <cds-table-header-cell>RPKI Origin AS</cds-table-header-cell>
+                                            <cds-table-header-cell>IRR Origin AS</cds-table-header-cell>
+                                            <cds-table-header-cell>Last Change</cds-table-header-cell>
+                                            <cds-table-header-cell>IRR Description</cds-table-header-cell>
+                                            <cds-table-header-cell>IRR Source</cds-table-header-cell>
+                                        </cds-table-header-row>
+                                    </cds-table-head>
+                                    <cds-table-body>
+                                        {% for prefix in prefixes %}
+                                        <cds-table-row>
+                                            <cds-table-cell>{{ prefix.prefix }}</cds-table-cell>
+                                            <cds-table-cell>{{ prefix.rpki_origin_as or '' }}</cds-table-cell>
+                                            <cds-table-cell>{{ prefix.irr_origin_as or '' }}</cds-table-cell>
+                                            <cds-table-cell>{{ prefix.last_changed or '' }}</cds-table-cell>
+                                            <cds-table-cell>{{ prefix.irr_description or '' }}</cds-table-cell>
+                                            <cds-table-cell>{{ prefix.irr_source or '' }}</cds-table-cell>
+                                        </cds-table-row>
+                                        {% endfor %}
+                                    </cds-table-body>
+                                </cds-table>
+                            </div>
+                        </div> 
                     </div>
                     <div class="content__panel" id="connectivity" aria-labelledby="tab-connectivity">
                         Tab Panel 3
                     </div>
-                    <div class="content__panel" id="measurements" aria-labelledby="tab-measurements">
+                    <div class="content__panel" id="activity" aria-labelledby="tab-activity">
                         Tab Panel 4
                     </div>
                     <div class="content__panel" id="whois" aria-labelledby="tab-whois">

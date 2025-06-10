@@ -114,6 +114,55 @@ def asn(asn):
             FROM info_asn
             WHERE asn = :asn
         """)
+
+        # Query for prefix aggregates
+        aggregates_query = text("""
+            SELECT r.aggregate
+            FROM (
+                SELECT distinct w.prefix,
+                    FIRST_VALUE(a.prefix) OVER (
+                        PARTITION BY w.prefix ORDER BY a.prefix ASC) as aggregate
+                FROM (
+                    SELECT prefix
+                    FROM global_ip_rib
+                    WHERE iswithdrawn = false
+                        AND recv_origin_as = :asn
+                        AND prefix_len > 0 and prefix_len <= 25
+                    GROUP BY prefix
+                ) w
+                JOIN (
+                    SELECT distinct prefix
+                    FROM global_ip_rib
+                    WHERE iswithdrawn = false 
+                        AND recv_origin_as = :asn
+                        AND prefix_len > 0 and prefix_len <= 25
+                ) a ON (w.prefix <<= a.prefix)
+            ) r
+            GROUP BY r.aggregate
+            ORDER BY aggregate
+        """)
+
+        # Query for advertised prefixes with details
+        advertised_prefixes_query = text("""
+            SELECT 
+                r.prefix,
+                r.rpki_origin_as,
+                i.origin_as as irr_origin_as,
+                r.last_change,
+                i.descr as irr_description,
+                i.source as irr_source
+            FROM (
+                SELECT 
+                    prefix,
+                    rpki_origin_as,
+                    max(timestamp) as last_change
+                FROM global_ip_rib
+                WHERE recv_origin_as = :asn
+                GROUP BY prefix, rpki_origin_as
+            ) r
+            LEFT JOIN info_route i ON (i.prefix = r.prefix)
+            ORDER BY r.prefix
+        """)
         
         # Execute queries
         ipv4_result = db.execute(ipv4_query, {"asn": asn})
@@ -135,6 +184,24 @@ def asn(asn):
         # Get ASN Info
         asn_info_result = db.execute(asn_info_query, {"asn": asn})
         asn_info = asn_info_result.fetchone()
+
+        # Get prefix aggregates
+        aggregates_result = db.execute(aggregates_query, {"asn": asn})
+        prefixes_aggregates = [row[0] for row in aggregates_result.fetchall()]
+
+        # Get advertised prefixes
+        advertised_prefixes_result = db.execute(advertised_prefixes_query, {"asn": asn})
+        prefixes = [
+            {
+                'prefix': row[0],
+                'rpki_origin_as': row[1],
+                'irr_origin_as': row[2],
+                'last_changed': row[3].isoformat() if row[3] else None,
+                'irr_description': row[4],
+                'irr_source': row[5]
+            }
+            for row in advertised_prefixes_result.fetchall()
+        ]
         
         # Process trend data
         trend_data = []
@@ -195,5 +262,7 @@ def asn(asn):
         trend_data=trend_data,
         asn_info=asn_info_dict,
         upstream_asns=upstream_asns,
-        downstream_asns=downstream_asns
+        downstream_asns=downstream_asns,
+        prefixes_aggregates=prefixes_aggregates,
+        prefixes=prefixes
     )
