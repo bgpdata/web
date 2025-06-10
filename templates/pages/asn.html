@@ -104,7 +104,7 @@ AS{{ asn }} {{ as_name }}
                                 <div class="charts__item charts__item--span-5-columns" id="ips-graph"></div>
                             </div>
                             <div class="content__tables">
-                                <cds-table class="tables__item tables__item--span-16-columns cds-theme-zone-white" with-header="true" {% if asn_info.remarks %}expandable="true"{% endif %} size="lg">
+                                <cds-table class="tables__item tables__item--span-16-columns cds-theme-zone-white" with-header="true">
                                     <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
                                         ASN Information
                                     </cds-table-header-title>
@@ -124,7 +124,7 @@ AS{{ asn }} {{ as_name }}
                                         </cds-table-header-row>
                                     </cds-table-head>
                                     <cds-table-body>
-                                        <cds-table-row {% if asn_info.remarks %}expanded="true"{% endif %}>
+                                        <cds-table-row>
                                             <cds-table-cell>{{ asn_info.as_name }}</cds-table-cell>
                                             <cds-table-cell>{{ asn_info.org_id }}</cds-table-cell>
                                             <cds-table-cell>{{ asn_info.org_name }}</cds-table-cell>
@@ -134,12 +134,9 @@ AS{{ asn }} {{ as_name }}
                                             <cds-table-cell>{{ asn_info.country }}</cds-table-cell>
                                             <cds-table-cell>{{ asn_info.source }}</cds-table-cell>
                                         </cds-table-row>
-                                        <cds-table-expanded-row>
-                                            <div style="padding: 1.5rem 1.5rem 1.5rem 0;">{{ asn_info.remarks }}</div>
-                                        </cds-table-expanded-row>
                                     </cds-table-body>
                                 </cds-table>
-                                <cds-table class="tables__item tables__item--span-8-columns cds-theme-zone-white" with-header="true" {% if asn_info.remarks %}expandable="true"{% endif %} size="lg">
+                                <cds-table class="tables__item tables__item--span-8-columns cds-theme-zone-white" with-header="true" style="height: fit-content;">
                                     <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
                                         Upstream ASNs
                                     </cds-table-header-title>
@@ -155,13 +152,13 @@ AS{{ asn }} {{ as_name }}
                                     <cds-table-body>
                                         {% for upstream_asn in upstream_asns %}
                                         <cds-table-row>
-                                            <cds-table-cell>{{ upstream_asn.asn }}</cds-table-cell>
+                                            <cds-table-cell>AS{{ upstream_asn.asn }}</cds-table-cell>
                                             <cds-table-cell>{{ upstream_asn.name }}</cds-table-cell>
                                         </cds-table-row>
                                         {% endfor %}
                                     </cds-table-body>
                                 </cds-table>
-                                <cds-table class="tables__item tables__item--span-8-columns cds-theme-zone-white" with-header="true" {% if asn_info.remarks %}expandable="true"{% endif %} size="lg">
+                                <cds-table class="tables__item tables__item--span-8-columns cds-theme-zone-white" with-header="true" style="height: fit-content;">
                                     <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
                                         Downstream ASNs
                                     </cds-table-header-title>
@@ -177,7 +174,7 @@ AS{{ asn }} {{ as_name }}
                                     <cds-table-body>
                                         {% for downstream_asn in downstream_asns %}
                                         <cds-table-row>
-                                            <cds-table-cell>{{ downstream_asn.asn }}</cds-table-cell>
+                                            <cds-table-cell>AS{{ downstream_asn.asn }}</cds-table-cell>
                                             <cds-table-cell>{{ downstream_asn.name }}</cds-table-cell>
                                         </cds-table-row>
                                         {% endfor %}

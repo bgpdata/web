@@ -28,12 +28,13 @@
         <!-- IBM Carbon -->
         <link rel="stylesheet" href="https://1.www.s81c.com/common/carbon/plex/sans.css" />
         <link rel="stylesheet" href="https://1.www.s81c.com/common/carbon/web-components/tag/v2/latest/themes.css" />         
-        <style>
-            /* Suppress custom element until styles are loaded */
-            cds-textarea:not(:defined) {
-              display: none;
+        
+        <style type="text/css">
+            cds-dropdown:not(:defined),
+            cds-dropdown-item:not(:defined) {
+              visibility: hidden;
             }
-        </style>
+          </style>
 
         <!-- FontAwesome -->
         <link

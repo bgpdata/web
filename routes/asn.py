@@ -54,6 +54,34 @@ def asn(asn):
             WHERE asn is not null
         """)
         
+        # Query for detailed upstream ASNs
+        upstream_details_query = text("""
+            SELECT d.asn, i.as_name as name
+            FROM (
+                SELECT DISTINCT
+                    as_path[array_position(as_path, :asn) - 1] as asn
+                FROM base_attrs a
+                WHERE as_path && ARRAY[:asn]::bigint[]
+            ) d
+            LEFT JOIN info_asn i ON (i.asn = d.asn)
+            WHERE d.asn is not null and d.asn != :asn
+            ORDER BY d.asn
+        """)
+        
+        # Query for detailed downstream ASNs
+        downstream_details_query = text("""
+            SELECT d.asn, i.as_name as name
+            FROM (
+                SELECT DISTINCT
+                    as_path[(array_positions(as_path, :asn))[cardinality(array_positions(as_path, :asn))] + 1] as asn
+                FROM base_attrs a
+                WHERE as_path && ARRAY[:asn]::bigint[]
+            ) d
+            LEFT JOIN info_asn i ON (i.asn = d.asn)
+            WHERE d.asn is not null
+            ORDER BY d.asn
+        """)
+        
         # Query for Originating Prefix trend
         trend_query = text("""
             SELECT
@@ -92,6 +120,10 @@ def asn(asn):
         ipv6_result = db.execute(ipv6_query, {"asn": asn})
         upstream_result = db.execute(upstream_query, {"asn": asn})
         downstream_result = db.execute(downstream_query, {"asn": asn})
+        
+        # Get detailed upstream and downstream ASNs
+        upstream_details_result = db.execute(upstream_details_query, {"asn": asn})
+        downstream_details_result = db.execute(downstream_details_query, {"asn": asn})
         
         # Get trend data for last 24 hours
         start_time = datetime.utcnow() - timedelta(hours=24)
@@ -136,6 +168,17 @@ def asn(asn):
             'raw_output': asn_info[8] if asn_info else None,
             'source': asn_info[9] if asn_info else None
         }
+        
+        # Process upstream and downstream ASNs
+        upstream_asns = [
+            {'asn': row[0], 'name': row[1] or f'AS{row[0]}'}
+            for row in upstream_details_result.fetchall()
+        ]
+        
+        downstream_asns = [
+            {'asn': row[0], 'name': row[1] or f'AS{row[0]}'}
+            for row in downstream_details_result.fetchall()
+        ]
 
     except Exception as e:
         app.logger.error(f"Failed to retrieve AS{asn}: {str(e)}")
@@ -150,5 +193,7 @@ def asn(asn):
         upstream_count=upstream_count,
         downstream_count=downstream_count,
         trend_data=trend_data,
-        asn_info=asn_info_dict
+        asn_info=asn_info_dict,
+        upstream_asns=upstream_asns,
+        downstream_asns=downstream_asns
     )
