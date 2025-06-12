@@ -1,7 +1,3 @@
-"""
-BGPDATA - A BGP Data Aggregation Service.
-© 2024 BGPDATA. All rights reserved.
-"""
 from flask import session, request, current_app as app
 from flask_caching import Cache
 from functools import wraps

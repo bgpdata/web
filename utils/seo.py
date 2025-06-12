@@ -1,7 +1,3 @@
-"""
-BGPDATA - A BGP Data Aggregation Service.
-© 2024 BGPDATA. All rights reserved.
-"""
 from flask import current_app as app
 
 def get_sitemap():    

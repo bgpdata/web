@@ -1,7 +1,3 @@
-"""
-BGPDATA - A BGP Data Aggregation Service.
-© 2024 BGPDATA. All rights reserved.
-"""
 import re
 
 def is_valid_email(email):

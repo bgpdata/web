@@ -1,7 +1,3 @@
-"""
-BGPDATA - A BGP Data Aggregation Service.
-© 2024 BGPDATA. All rights reserved.
-"""
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from flask import current_app as app

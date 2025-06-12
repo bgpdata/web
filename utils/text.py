@@ -1,7 +1,3 @@
-"""
-BGPDATA - A BGP Data Aggregation Service.
-© 2024 BGPDATA. All rights reserved.
-"""
 from bs4 import BeautifulSoup, Comment
 from datetime import datetime
 import hashlib

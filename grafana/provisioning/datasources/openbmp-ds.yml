@@ -21,14 +21,14 @@ datasources:
     # <string> url
     url: postgres:5432
     # <string> database user, if used
-    user: openbmp
+    user: bgpdata
     # <string> database name, if used
-    database: openbmp
+    database: bgpdata
     # <bool> mark as default datasource. Max one per org
     isDefault: true
 
     secureJsonData:
-      password: openbmp
+      password: bgpdata
 
     # <map> fields that will be converted to json and stored in json_data
     jsonData:

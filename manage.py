@@ -6,7 +6,7 @@ import subprocess
 import argparse
 import asyncio
 from pathlib import Path
-from config import MainConfig, RelayConfig
+from config import Config
 
 # Ensure the root directory is in sys.path
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
@@ -85,22 +85,12 @@ def migrate():
             print(f"failed.")
             return
 
-def relay():
-    """
-    Runs the relay.
-    """
-    # Validate the configuration
-    RelayConfig.validate()
-
-    import relay.main as module
-    asyncio.run(module.main())
-
 def run(workers="1", host="localhost", port=8080, reload=False):
     """
     Runs the application.
     """
     # Validate the configuration
-    MainConfig.validate()
+    Config.validate()
 
     if reload:
         # Get the app instance
@@ -128,9 +118,6 @@ def main():
     # Migrate command
     subparsers.add_parser('migrate', help='Run database migrations')
 
-    # Relay command
-    subparsers.add_parser('relay', help='Run the relay')
-
     # Run command
     run_parser = subparsers.add_parser('run', help='Run the application')
     run_parser.add_argument('--workers', default='1', help='Number of workers to run with Gunicorn')
@@ -143,9 +130,6 @@ def main():
     if args.command == 'migrate':
         print("Applying migrations...")
         migrate()
-    elif args.command == 'relay':
-        print("Starting relay...")
-        relay()
     elif args.command == 'run':
         print("Starting server...")
         print(f"Starting with reload: {args.reload}")

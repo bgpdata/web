@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, abort, session, current_app as app, jsonify
 from utils.text import time_ago, format_text, clean_text, alphanumeric_text, clean_text, sanitize_text, date_text
 from flask_compress import Compress
-from config import MainConfig as Config
+from config import Config
 from flask_cors import CORS
 from flask_talisman import Talisman
 from utils.socket import sock, WebSocketBroadcaster
