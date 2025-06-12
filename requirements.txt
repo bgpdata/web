@@ -7,7 +7,6 @@ flask-sock
 flask-talisman
 flask-caching
 libsass
-pytz
 bleach
 gevent
 jmxquery
