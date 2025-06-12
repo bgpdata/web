@@ -108,7 +108,7 @@ AS{{ asn }} {{ as_name }}
                                     <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
                                         ASN Information
                                     </cds-table-header-title>
-                                    <cds-table-header-description slot="description" style="font-weight: 250; font-size: 1rem; margin-bottom: -0.5rem;">
+                                    <cds-table-header-description slot="description" style="font-weight: 250; font-size: 1rem; margin-bottom: -0.5rem; letter-spacing: 0.2px;">
                                         Information from various public datasets
                                     </cds-table-header-description>
                                     <cds-table-head>
@@ -140,7 +140,7 @@ AS{{ asn }} {{ as_name }}
                                     <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
                                         Upstream ASNs
                                     </cds-table-header-title>
-                                    <cds-table-header-description slot="description" style="font-weight: 250; font-size: 1rem; margin-bottom: -0.5rem;">
+                                    <cds-table-header-description slot="description" style="font-weight: 250; font-size: 1rem; margin-bottom: -0.5rem; letter-spacing: 0.2px;">
                                         ASNs that have routes to this ASN
                                     </cds-table-header-description>
                                     <cds-table-head>
@@ -162,7 +162,7 @@ AS{{ asn }} {{ as_name }}
                                     <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
                                         Downstream ASNs
                                     </cds-table-header-title>
-                                    <cds-table-header-description slot="description" style="font-weight: 250; font-size: 1rem; margin-bottom: -0.5rem;">
+                                    <cds-table-header-description slot="description" style="font-weight: 250; font-size: 1rem; margin-bottom: -0.5rem; letter-spacing: 0.2px;">
                                         ASNs that this ASN has routes to
                                     </cds-table-header-description>
                                     <cds-table-head>
@@ -190,7 +190,7 @@ AS{{ asn }} {{ as_name }}
                                     <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
                                         Aggregates
                                     </cds-table-header-title>
-                                    <cds-table-header-description slot="description" style="font-weight: 250; font-size: 1rem; margin-bottom: -0.5rem;">
+                                    <cds-table-header-description slot="description" style="font-weight: 250; font-size: 1rem; margin-bottom: -0.5rem; letter-spacing: 0.2px;">
                                         All prefixes advertised by this ASN
                                     </cds-table-header-description>
                                     <cds-table-head>
@@ -211,7 +211,7 @@ AS{{ asn }} {{ as_name }}
                                     <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
                                         Advertised Prefixes
                                     </cds-table-header-title>
-                                    <cds-table-header-description slot="description" style="font-weight: 250; font-size: 1rem; margin-bottom: -0.5rem;">
+                                    <cds-table-header-description slot="description" style="font-weight: 250; font-size: 1rem; margin-bottom: -0.5rem; letter-spacing: 0.2px;">
                                         All prefixes advertised by this ASN, including multiple entries from IRR databases
                                     </cds-table-header-description>
                                     <cds-table-toolbar slot="toolbar">
@@ -312,6 +312,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial load
     handleHashChange();
 });
+</script>
+<script>
+    BGPDATA.create(
+      "bgp-explorer",
+      {
+        resource: "2409:875c:8500::/40",
+        rrcs: "0,1,2,3",
+        unix_timestamps: "TRUE",
+        ignoreReannouncements: true,
+        starttime: 1728129599,
+        endtime: 1728215999,
+      },
+      "bgp-explorer",
+      { disable: ["controls"] },
+    );
 </script>
 <script>
     const data = {{ trend_data|tojson }}.flatMap(item => [
