@@ -4,12 +4,14 @@
     width: 100%;
 
     .header__container {
-        max-width: 80rem;
+        max-width: 99rem;
         margin-left: auto;
         margin-right: auto;
         height: 100%;
         display: flex;
         align-items: center;
+        padding-left: 2.5rem;
+        padding-right: 21px;
         justify-content: space-between;
 
         .container__skip-to-content {
@@ -18,14 +20,14 @@
 
         .container__logo {
             height: 35.5px;
-            width: 262px;
+            flex-shrink: 0;
+            margin-right: 3rem;
         }
 
         .container__actions {
             display: flex;
             justify-content: flex-end;
-            padding: 0 10px;
-            width: 262px;
+            flex-shrink: 0;
 
             * {
                 &:not(:last-child) {
