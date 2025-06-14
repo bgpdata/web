@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-import sys
-import os
-import glob
-import subprocess
-import argparse
-import asyncio
+from gevent import monkey; monkey.patch_all()
 from pathlib import Path
 from config import Config
+import subprocess
+import argparse
+import glob
+import sys
+import os
 
 # Ensure the root directory is in sys.path
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
