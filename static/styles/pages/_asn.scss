@@ -72,7 +72,7 @@
                 display: flex;
                 flex-wrap: wrap;
                 max-width: 99rem;
-                height: 3.5rem;
+                height: 3.25rem;
                 margin-right: auto;
                 margin-left: auto;
                 padding: 0 2.5rem;
@@ -97,15 +97,24 @@
                         text-align: left;
                         align-items: center;
 
+                        &:first-child:before {
+                            width: calc(100% + 1px);
+                            left: -1px;
+                        }
+
+                        &:last-child:before {
+                            width: calc(100% + 1px);
+                        }
+
                         &:before {
                             content: '';
                             display: block;
                             height: 2.5px;
-                            width: calc(100% + 1px);
+                            width: 100%;
                             background: transparent;
                             position: absolute;
                             top: 0;
-                            left: -1px;
+                            left: 0;
                         }
 
                         &:first-child:not(.tab__item--active) {
