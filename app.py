@@ -1,19 +1,18 @@
 from flask import Flask, render_template, request, redirect, url_for, abort, session, current_app as app, jsonify
 from utils.text import time_ago, format_text, clean_text, alphanumeric_text, clean_text, sanitize_text, date_text
-from flask_compress import Compress
-from config import Config
-from flask_cors import CORS
-from flask_talisman import Talisman
 from utils.socket import sock, WebSocketBroadcaster
 from utils.kafka import get_kafka_ingest_rate
 from utils.scheduler import scheduler
 from utils.cache import cache, caching
 from utils.limiter import limiter
+from flask_compress import Compress
+from flask_talisman import Talisman
 from utils.jobs import example_job
 from utils.seo import get_sitemap
 from routes.asn import asn_blueprint
 from datetime import timedelta
 from logging import StreamHandler
+from config import Config
 import logging
 import atexit
 import sass # type: ignore
@@ -74,19 +73,6 @@ def create_app():
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=90)
     app.config['SESSION_REFRESH_EACH_REQUEST'] = True
-
-    # Initialize CORS
-    cors_origin = [
-        'https://bgp-data.net',
-        'http://localhost:8080',
-        re.compile(r'^https?://100\.\d+\.\d+\.\d+(?::\d+)?(?:/.*)?$') # VPN 100.x.x.x
-    ]
-
-    #CORS(
-    #    app,
-    #    resources={r"/*": {"origins": cors_origin}},
-    #    supports_credentials=True,
-    #)
 
     # Initialize Flask-Talisman
     if app.config['ENVIRONMENT'] == 'production':
@@ -214,15 +200,15 @@ def create_app():
     WebSockets
     """
 
-    ingest_rate_broadcaster = WebSocketBroadcaster(get_kafka_ingest_rate)
+    #ingest_rate_broadcaster = WebSocketBroadcaster(get_kafka_ingest_rate)
 
-    @sock.route('/ws/v1/rate')
-    def ws_v1_rate(ws):
-        try:
-            app.logger.info("WebSocket connected")
-            ingest_rate_broadcaster.register(ws)
-        except Exception as e:
-            app.logger.error("WebSocket error: %s", str(e), exc_info=True)
+    #@sock.route('/ws/v1/rate')
+    #def ws_v1_rate(ws):
+    #    try:
+    #        app.logger.info("WebSocket connected")
+    #        ingest_rate_broadcaster.register(ws)
+    #    except Exception as e:
+    #        app.logger.error("WebSocket error: %s", str(e), exc_info=True)
 
 
     """

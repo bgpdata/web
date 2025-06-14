@@ -5,7 +5,7 @@ import gevent
 sock = Sock()
 
 class WebSocketBroadcaster:
-    def __init__(self, fetch_func, interval=2):
+    def __init__(self, fetch_func, interval=1):
         self.fetch_func = fetch_func
         self.interval = interval
         self.subscribers = set()
@@ -19,7 +19,7 @@ class WebSocketBroadcaster:
             # Pass the current app context to the spawned greenlet
             self._loop_task = gevent.spawn(self._loop, app._get_current_object())
             # Give the loop a chance to start
-            gevent.sleep(0.1)
+            gevent.sleep(0.5)
 
         try:
             # This loop just waits for the client to disconnect.
@@ -43,5 +43,7 @@ class WebSocketBroadcaster:
                         ws.send(str(data))
                     except Exception:
                         self.subscribers.discard(ws)
+
+                gevent.sleep(self.interval)
                 
             self._loop_task = None

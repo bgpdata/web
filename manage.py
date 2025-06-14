@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from gevent import monkey; monkey.patch_all()
 from pathlib import Path
 from config import Config
 import subprocess
