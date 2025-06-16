@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, abort, session, current_app as app, jsonify
+from flask import Flask, render_template, request, redirect, url_for, abort, current_app as app
 from utils.text import time_ago, format_text, clean_text, alphanumeric_text, clean_text, sanitize_text, date_text
-from utils.socket import sock, WebSocketBroadcaster
-from utils.kafka import KafkaProducer
+from routes.asn import asn_blueprint, asn_api_v1_blueprint
+from utils.socket import sock, broadcaster
 from utils.scheduler import scheduler
 from utils.cache import cache, caching
 from utils.limiter import limiter
@@ -9,7 +9,6 @@ from flask_compress import Compress
 from flask_talisman import Talisman
 #from utils.jobs import example_job
 from utils.seo import get_sitemap
-from routes.asn import asn_blueprint
 from datetime import timedelta
 from logging import StreamHandler
 from config import Config
@@ -40,16 +39,6 @@ def create_app():
     
     # Load configuration
     app.config.from_object(Config)
-
-    # Kafka Producer
-    try:
-        producer = KafkaProducer(
-            bootstrap_servers='kafka:29092',
-            value_serializer=lambda v: v.encode('utf-8')
-        )
-    except Exception as e:
-        app.logger.error(f"Failed to create Kafka producer: {e}")
-        producer = None
 
     # Configure logging
     # Remove any existing handlers
@@ -184,55 +173,45 @@ def create_app():
     @caching(timeout=86400) # 24 hours
     def sitemap_index_xml():
         return sitemap(get_sitemap)
-    
+
+
     """
-    REST API
+    Subscriptions
     """
 
-    @app.route('/api/v1/example', methods=['GET'])
-    @limiter.limit("100 per minute")
-    @caching(timeout=900) # Cache for 15 minutes
-    def api_v1_example():
+    # Initialize socket
+    broadcaster.init_app(app)
+
+    # Register socket shutdown
+    atexit.register(lambda: broadcaster.shutdown(wait=False))
+
+    # Start socket
+    broadcaster.start()
+
+    @sock.route('/ws/v1/subscribe/<resource>')
+    def ws_v1_subscribe(ws, resource):
         try:
-            # Example
-            example = "Example"
-
-            return jsonify({
-                "example": example
-            })
-
-        except Exception as e:
-            app.logger.error("Failed to get example: %s", str(e), exc_info=True)
-            return abort(500, description="An error occurred")
-
-
-    """
-    WebSockets
-    """
-
-    broadcaster = WebSocketBroadcaster()
-
-    @sock.route('/ws/v1/asn/<int:asn>')
-    def ws_v1_asn(ws, asn):
-        try:
-            app.logger.info(f"WebSocket connected for ASN {asn}")
-            broadcaster.register(ws, f"asn_{asn}")
-
-            if producer:
-                app.logger.info(f"Sending subscription request for ASN {asn}")
-                message = f"subscribe\t{asn}"
-                producer.send('asn-subscription-requests', message)
+            app.logger.info(f"WebSocket connected for {resource}")
+            broadcaster.register(ws, resource=resource)
 
             while True:
-                # Keep the connection open
-                data = ws.receive(timeout=60)
-                if data == 'ping':
-                    ws.send('pong')
+                try:
+                    # Keep the connection open and handle ping messages
+                    data = ws.receive(timeout=60)
+                    if data == 'ping':
+                        ws.send('pong')
+                except Exception as e:
+                    if isinstance(e, TimeoutError):
+                        # Send a ping to keep the connection alive
+                        ws.send('ping')
+                        continue
+                    app.logger.error(f"WebSocket error for {resource}: {str(e)}", exc_info=True)
+                    break
         except Exception as e:
-            app.logger.error("WebSocket error: %s", str(e), exc_info=True)
+            app.logger.error(f"WebSocket connection error for {resource}: {str(e)}", exc_info=True)
         finally:
-            app.logger.info(f"WebSocket disconnected for ASN {asn}")
-            broadcaster.unregister(ws, f"asn_{asn}")
+            app.logger.info(f"WebSocket disconnected for {resource}")
+            broadcaster.unregister(ws, resource)
 
 
     """
@@ -241,7 +220,7 @@ def create_app():
 
 
     @app.route('/')
-    #@caching(timeout=86400) # 24 hours
+    @caching(timeout=86400) # 24 hours
     def index():
         try:
             example = "Example5"
@@ -255,6 +234,7 @@ def create_app():
 
     # Register Blueprints
     app.register_blueprint(asn_blueprint, url_prefix='/as')
+    app.register_blueprint(asn_api_v1_blueprint, url_prefix='/api/v1/as')
 
     return app
 

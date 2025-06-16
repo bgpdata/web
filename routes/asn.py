@@ -1,103 +1,20 @@
-from flask import Blueprint, render_template, abort, current_app as app
-from utils.database import PostgreSQL
-from sqlalchemy import text
+from flask import Blueprint, render_template, abort, current_app as app, jsonify
+from utils.database import get_db, close_db
 from datetime import datetime, timedelta
-import json
+from utils.limiter import limiter
+from utils.cache import caching
+from sqlalchemy import text
 
-# Create Blueprint
+# Create Blueprints
 asn_blueprint = Blueprint('as', __name__)
+asn_api_v1_blueprint = Blueprint('as_api_v1', __name__)
 
-def get_asn_data(asn):
+@asn_api_v1_blueprint.route('/info/<int:asn>', methods=['GET'])
+@limiter.limit("100 per minute")
+def api_v1_asn_info(asn):
+    db = None
     try:
-        # Initialize database connection
-        db = PostgreSQL()
-        
-        # Query for IPv4 prefixes
-        ipv4_query = text("""
-            SELECT count(*) as count
-            FROM global_ip_rib
-            WHERE recv_origin_as = :asn
-            AND family(prefix) = 4
-            GROUP BY prefix
-        """)
-        
-        # Query for IPv6 prefixes
-        ipv6_query = text("""
-            SELECT count(*) as count
-            FROM global_ip_rib
-            WHERE recv_origin_as = :asn
-            AND family(prefix) = 6
-            GROUP BY prefix
-        """)
-        
-        # Query for upstream ASNs
-        upstream_query = text("""
-            SELECT count(distinct asn) as count
-            FROM (
-                SELECT
-                    as_path[array_position(as_path, :asn) - 1] as asn
-                FROM base_attrs a
-                WHERE as_path && ARRAY[:asn]::bigint[]
-            ) d
-            WHERE asn is not null and asn != :asn
-        """)
-        
-        # Query for downstream ASNs
-        downstream_query = text("""
-            SELECT count(distinct asn) as count
-            FROM (
-                SELECT
-                    as_path[(array_positions(as_path, :asn))[cardinality(array_positions(as_path, :asn))] + 1] as asn
-                FROM base_attrs a
-                WHERE as_path && ARRAY[:asn]::bigint[]
-            ) d
-            WHERE asn is not null
-        """)
-        
-        # Query for detailed upstream ASNs
-        upstream_details_query = text("""
-            SELECT d.asn, i.as_name as name
-            FROM (
-                SELECT DISTINCT
-                    as_path[array_position(as_path, :asn) - 1] as asn
-                FROM base_attrs a
-                WHERE as_path && ARRAY[:asn]::bigint[]
-            ) d
-            LEFT JOIN info_asn i ON (i.asn = d.asn)
-            WHERE d.asn is not null and d.asn != :asn
-            ORDER BY d.asn
-        """)
-        
-        # Query for detailed downstream ASNs
-        downstream_details_query = text("""
-            SELECT d.asn, i.as_name as name
-            FROM (
-                SELECT DISTINCT
-                    as_path[(array_positions(as_path, :asn))[cardinality(array_positions(as_path, :asn))] + 1] as asn
-                FROM base_attrs a
-                WHERE as_path && ARRAY[:asn]::bigint[]
-            ) d
-            LEFT JOIN info_asn i ON (i.asn = d.asn)
-            WHERE d.asn is not null
-            ORDER BY d.asn
-        """)
-        
-        # Query for Originating Prefix trend
-        trend_query = text("""
-            SELECT
-                interval_time,
-                v4_prefixes,
-                v6_prefixes,
-                v4_with_rpki,
-                v6_with_rpki,
-                v4_with_irr,
-                v6_with_irr
-            FROM stats_ip_origins
-            WHERE asn = :asn
-            AND interval_time >= :start_time
-            ORDER BY interval_time ASC
-        """)
-        
+        db = get_db()
         # Query for ASN Info
         asn_info_query = text("""
             SELECT 
@@ -115,7 +32,240 @@ def get_asn_data(asn):
             WHERE asn = :asn
         """)
 
-        # Query for prefix aggregates
+        # Get ASN Info
+        asn_info_result = db.execute(asn_info_query, {"asn": asn})
+        asn_info = asn_info_result.fetchone()
+
+        return jsonify({
+            'as_name': asn_info[0] if asn_info else None,
+            'org_id': asn_info[1] if asn_info else None,
+            'org_name': asn_info[2] if asn_info else None,
+            'address': asn_info[3] if asn_info else None,
+            'city': asn_info[4] if asn_info else None,
+            'state_prov': asn_info[5] if asn_info else None,
+            'country': asn_info[6] if asn_info else None,
+            'remarks': asn_info[7] if asn_info else None,
+            'raw_output': asn_info[8] if asn_info else None,
+            'source': asn_info[9] if asn_info else None
+        })
+
+    except Exception as e:
+        app.logger.error("Failed to get asn info: %s", str(e), exc_info=True)
+        return abort(500, description="An error occurred")
+    finally:
+        close_db(db)
+
+@asn_api_v1_blueprint.route('/ipv4-count/<int:asn>', methods=['GET'])
+@limiter.limit("100 per minute")
+def api_v1_asn_ipv4_count(asn):
+    db = None
+    try:
+        db = get_db()
+        ipv4_query = text("""
+            SELECT count(*) as count
+            FROM global_ip_rib
+            WHERE recv_origin_as = :asn
+            AND family(prefix) = 4
+            GROUP BY prefix
+        """)
+        
+        result = db.execute(ipv4_query, {"asn": asn})
+        count = sum(row[0] for row in result.fetchall())
+        return jsonify({"count": count})
+    except Exception as e:
+        app.logger.error("Failed to get ipv4 count: %s", str(e), exc_info=True)
+        return abort(500, description="An error occurred")
+    finally:
+        close_db(db)
+
+@asn_api_v1_blueprint.route('/ipv6-count/<int:asn>', methods=['GET'])
+@limiter.limit("100 per minute")
+def api_v1_asn_ipv6_count(asn):
+    db = None
+    try:
+        db = get_db()
+        ipv6_query = text("""
+            SELECT count(*) as count
+            FROM global_ip_rib
+            WHERE recv_origin_as = :asn
+            AND family(prefix) = 6
+            GROUP BY prefix
+        """)
+        
+        result = db.execute(ipv6_query, {"asn": asn})
+        count = sum(row[0] for row in result.fetchall())
+        return jsonify({"count": count})
+    except Exception as e:
+        app.logger.error("Failed to get ipv6 count: %s", str(e), exc_info=True)
+        return abort(500, description="An error occurred")
+    finally:
+        close_db(db)
+
+@asn_api_v1_blueprint.route('/upstream-count/<int:asn>', methods=['GET'])
+@limiter.limit("100 per minute")
+def api_v1_asn_upstream_count(asn):
+    db = None
+    try:
+        db = get_db()
+        upstream_query = text("""
+            SELECT count(distinct asn) as count
+            FROM (
+                SELECT
+                    as_path[array_position(as_path, :asn) - 1] as asn
+                FROM base_attrs a
+                WHERE as_path && ARRAY[:asn]::bigint[]
+            ) d
+            WHERE asn is not null and asn != :asn
+        """)
+        
+        result = db.execute(upstream_query, {"asn": asn})
+        count = result.scalar() or 0
+        return jsonify({"count": count})
+    except Exception as e:
+        app.logger.error("Failed to get upstream count: %s", str(e), exc_info=True)
+        return abort(500, description="An error occurred")
+    finally:
+        close_db(db)
+
+@asn_api_v1_blueprint.route('/downstream-count/<int:asn>', methods=['GET'])
+@limiter.limit("100 per minute")
+def api_v1_asn_downstream_count(asn):
+    db = None
+    try:
+        db = get_db()
+        downstream_query = text("""
+            SELECT count(distinct asn) as count
+            FROM (
+                SELECT
+                    as_path[(array_positions(as_path, :asn))[cardinality(array_positions(as_path, :asn))] + 1] as asn
+                FROM base_attrs a
+                WHERE as_path && ARRAY[:asn]::bigint[]
+            ) d
+            WHERE asn is not null
+        """)
+        
+        result = db.execute(downstream_query, {"asn": asn})
+        count = result.scalar() or 0
+        return jsonify({"count": count})
+    except Exception as e:
+        app.logger.error("Failed to get downstream count: %s", str(e), exc_info=True)
+        return abort(500, description="An error occurred")
+    finally:
+        close_db(db)
+
+@asn_api_v1_blueprint.route('/upstream-details/<int:asn>', methods=['GET'])
+@limiter.limit("100 per minute")
+def api_v1_asn_upstream_details(asn):
+    db = None
+    try:
+        db = get_db()
+        upstream_details_query = text("""
+            SELECT d.asn, i.as_name as name
+            FROM (
+                SELECT DISTINCT
+                    as_path[array_position(as_path, :asn) - 1] as asn
+                FROM base_attrs a
+                WHERE as_path && ARRAY[:asn]::bigint[]
+            ) d
+            LEFT JOIN info_asn i ON (i.asn = d.asn)
+            WHERE d.asn is not null and d.asn != :asn
+            ORDER BY d.asn
+        """)
+        
+        result = db.execute(upstream_details_query, {"asn": asn})
+        upstream_asns = [
+            {'asn': row[0], 'name': row[1] or f'AS{row[0]}'}
+            for row in result.fetchall()
+        ]
+        return jsonify(upstream_asns)
+    except Exception as e:
+        app.logger.error("Failed to get upstream details: %s", str(e), exc_info=True)
+        return abort(500, description="An error occurred")
+    finally:
+        close_db(db)
+
+@asn_api_v1_blueprint.route('/downstream-details/<int:asn>', methods=['GET'])
+@limiter.limit("100 per minute")
+def api_v1_asn_downstream_details(asn):
+    db = None
+    try:
+        db = get_db()
+        downstream_details_query = text("""
+            SELECT d.asn, i.as_name as name
+            FROM (
+                SELECT DISTINCT
+                    as_path[(array_positions(as_path, :asn))[cardinality(array_positions(as_path, :asn))] + 1] as asn
+                FROM base_attrs a
+                WHERE as_path && ARRAY[:asn]::bigint[]
+            ) d
+            LEFT JOIN info_asn i ON (i.asn = d.asn)
+            WHERE d.asn is not null
+            ORDER BY d.asn
+        """)
+        
+        result = db.execute(downstream_details_query, {"asn": asn})
+        downstream_asns = [
+            {'asn': row[0], 'name': row[1] or f'AS{row[0]}'}
+            for row in result.fetchall()
+        ]
+        return jsonify(downstream_asns)
+    except Exception as e:
+        app.logger.error("Failed to get downstream details: %s", str(e), exc_info=True)
+        return abort(500, description="An error occurred")
+    finally:
+        close_db(db)
+
+@asn_api_v1_blueprint.route('/trend/<int:asn>', methods=['GET'])
+@limiter.limit("100 per minute")
+def api_v1_asn_trend(asn):
+    db = None
+    try:
+        db = get_db()
+        trend_query = text("""
+            SELECT
+                interval_time,
+                v4_prefixes,
+                v6_prefixes,
+                v4_with_rpki,
+                v6_with_rpki,
+                v4_with_irr,
+                v6_with_irr
+            FROM stats_ip_origins
+            WHERE asn = :asn
+            AND interval_time >= :start_time
+            ORDER BY interval_time ASC
+        """)
+        
+        start_time = datetime.utcnow() - timedelta(hours=24)
+        result = db.execute(trend_query, {
+            "asn": asn,
+            "start_time": start_time
+        })
+        
+        trend_data = []
+        for row in result.fetchall():
+            trend_data.append({
+                'time': row[0].isoformat(),
+                'v4_prefixes': row[1],
+                'v6_prefixes': row[2],
+                'v4_with_rpki': row[3],
+                'v6_with_rpki': row[4],
+                'v4_with_irr': row[5],
+                'v6_with_irr': row[6]
+            })
+        return jsonify(trend_data)
+    except Exception as e:
+        app.logger.error("Failed to get trend data: %s", str(e), exc_info=True)
+        return abort(500, description="An error occurred")
+    finally:
+        close_db(db)
+
+@asn_api_v1_blueprint.route('/prefix-aggregates/<int:asn>', methods=['GET'])
+@limiter.limit("100 per minute")
+def api_v1_asn_prefix_aggregates(asn):
+    db = None
+    try:
+        db = get_db()
         aggregates_query = text("""
             SELECT r.aggregate
             FROM (
@@ -141,8 +291,22 @@ def get_asn_data(asn):
             GROUP BY r.aggregate
             ORDER BY aggregate
         """)
+        
+        result = db.execute(aggregates_query, {"asn": asn})
+        prefixes_aggregates = [row[0] for row in result.fetchall()]
+        return jsonify(prefixes_aggregates)
+    except Exception as e:
+        app.logger.error("Failed to get prefix aggregates: %s", str(e), exc_info=True)
+        return abort(500, description="An error occurred")
+    finally:
+        close_db(db)
 
-        # Query for advertised prefixes with details
+@asn_api_v1_blueprint.route('/advertised-prefixes/<int:asn>', methods=['GET'])
+@limiter.limit("100 per minute")
+def api_v1_asn_advertised_prefixes(asn):
+    db = None
+    try:
+        db = get_db()
         advertised_prefixes_query = text("""
             SELECT 
                 r.prefix,
@@ -164,33 +328,7 @@ def get_asn_data(asn):
             ORDER BY r.prefix
         """)
         
-        # Execute queries
-        ipv4_result = db.execute(ipv4_query, {"asn": asn})
-        ipv6_result = db.execute(ipv6_query, {"asn": asn})
-        upstream_result = db.execute(upstream_query, {"asn": asn})
-        downstream_result = db.execute(downstream_query, {"asn": asn})
-        
-        # Get detailed upstream and downstream ASNs
-        upstream_details_result = db.execute(upstream_details_query, {"asn": asn})
-        downstream_details_result = db.execute(downstream_details_query, {"asn": asn})
-        
-        # Get trend data for last 24 hours
-        start_time = datetime.utcnow() - timedelta(hours=24)
-        trend_result = db.execute(trend_query, {
-            "asn": asn,
-            "start_time": start_time
-        })
-        
-        # Get ASN Info
-        asn_info_result = db.execute(asn_info_query, {"asn": asn})
-        asn_info = asn_info_result.fetchone()
-
-        # Get prefix aggregates
-        aggregates_result = db.execute(aggregates_query, {"asn": asn})
-        prefixes_aggregates = [row[0] for row in aggregates_result.fetchall()]
-
-        # Get advertised prefixes
-        advertised_prefixes_result = db.execute(advertised_prefixes_query, {"asn": asn})
+        result = db.execute(advertised_prefixes_query, {"asn": asn})
         prefixes = [
             {
                 'prefix': row[0],
@@ -200,74 +338,21 @@ def get_asn_data(asn):
                 'irr_description': row[4],
                 'irr_source': row[5]
             }
-            for row in advertised_prefixes_result.fetchall()
+            for row in result.fetchall()
         ]
-        
-        # Process trend data
-        trend_data = []
-        for row in trend_result.fetchall():
-            trend_data.append({
-                'time': row[0].isoformat(),
-                'v4_prefixes': row[1],
-                'v6_prefixes': row[2],
-                'v4_with_rpki': row[3],
-                'v6_with_rpki': row[4],
-                'v4_with_irr': row[5],
-                'v6_with_irr': row[6]
-            })
-        
-        # Calculate totals
-        ipv4_count = sum(row[0] for row in ipv4_result.fetchall())
-        ipv6_count = sum(row[0] for row in ipv6_result.fetchall())
-        upstream_count = upstream_result.scalar() or 0
-        downstream_count = downstream_result.scalar() or 0
-        
-        # Process ASN Info
-        asn_info_dict = {
-            'as_name': asn_info[0] if asn_info else None,
-            'org_id': asn_info[1] if asn_info else None,
-            'org_name': asn_info[2] if asn_info else None,
-            'address': asn_info[3] if asn_info else None,
-            'city': asn_info[4] if asn_info else None,
-            'state_prov': asn_info[5] if asn_info else None,
-            'country': asn_info[6] if asn_info else None,
-            'remarks': asn_info[7] if asn_info else None,
-            'raw_output': asn_info[8] if asn_info else None,
-            'source': asn_info[9] if asn_info else None
-        }
-        
-        # Process upstream and downstream ASNs
-        upstream_asns = [
-            {'asn': row[0], 'name': row[1] or f'AS{row[0]}'}
-            for row in upstream_details_result.fetchall()
-        ]
-        
-        downstream_asns = [
-            {'asn': row[0], 'name': row[1] or f'AS{row[0]}'}
-            for row in downstream_details_result.fetchall()
-        ]
-
-        return {
-            'asn': asn,
-            'as_name': asn_info_dict['as_name'],
-            'ipv4_count': ipv4_count,
-            'ipv6_count': ipv6_count,
-            'upstream_count': upstream_count,
-            'downstream_count': downstream_count,
-            'trend_data': trend_data,
-            'asn_info': asn_info_dict,
-            'upstream_asns': upstream_asns,
-            'downstream_asns': downstream_asns,
-            'prefixes_aggregates': prefixes_aggregates,
-            'prefixes': prefixes
-        }
+        return jsonify(prefixes)
     except Exception as e:
-        app.logger.error(f"Failed to retrieve data for AS{asn}: {str(e)}")
-        return None
+        app.logger.error("Failed to get advertised prefixes: %s", str(e), exc_info=True)
+        return abort(500, description="An error occurred")
+    finally:
+        close_db(db)
 
 @asn_blueprint.route("/<int:asn>")
+#@caching(timeout=86400) # 24 hours
 def asn(asn):
-    data = get_asn_data(asn)
-    if data is None:
-        return abort(500, description="An error occurred")
-    return render_template('pages/asn.html', **data)
+    return render_template('pages/asn.html', asn=asn)
+
+# Register blueprints
+def init_app(app):
+    app.register_blueprint(asn_blueprint)
+    app.register_blueprint(asn_api_v1_blueprint)

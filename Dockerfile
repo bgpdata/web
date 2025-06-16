@@ -33,12 +33,11 @@ RUN apt-get clean && \
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the requirements file into the container
-COPY requirements.txt .
+# Copy application code
+COPY . .
 
-# Install any dependencies
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install -e protocol/python
 
-# Copy the application code into the container
-COPY . .
+ENTRYPOINT ["python", "manage.py", "run"]

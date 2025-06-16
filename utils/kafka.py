@@ -9,7 +9,6 @@ jmx = JMXConnection(
 
 producer = Producer({
     'bootstrap.servers': Config.KAFKA_FQDN,
-    'value.serializer': lambda v: v.encode('utf-8')
 })
 
 consumer = Consumer({
@@ -21,7 +20,6 @@ consumer = Consumer({
     'security.protocol': 'PLAINTEXT',
     'fetch.max.bytes': 50 * 1024 * 1024, # 50 MB
     'session.timeout.ms': 30000,  # For stable group membership
-    'value.deserializer': lambda v: v.decode('utf-8')
 })
 
 def get_kafka_ingest_rate():
