@@ -1,49 +1,65 @@
+from bgpdata.api.parsed.message.Subscription import Subscription
+from confluent_kafka import KafkaError, KafkaException
+from utils.kafka import consumer, producer
 from flask import current_app as app
+from collections import defaultdict
 from flask_sock import Sock
-import gevent
+import threading
+import time
 
 sock = Sock()
 
-class WebSocketBroadcaster:
-    def __init__(self, fetch_func, interval=1):
-        self.fetch_func = fetch_func
-        self.interval = interval
-        self.subscribers = set()
-        self._loop_task = None
+consumer.subscribe(
+    ['bgpdata.parsed.notification']
+)
 
-    def register(self, ws):
-        self.subscribers.add(ws)
+class Socket:
+    def __init__(self, app):
+        self.subscriptions = defaultdict(set)
+        self._socket_thread = threading.Thread(target=self._run, daemon=True)
+        self._socket_thread.name = "SocketThread"
+        self._socket_thread.start()
+        self.app = app
 
-        # Start the broadcast loop greenlet if it's not running
-        if self._loop_task is None or self._loop_task.dead:
-            # Pass the current app context to the spawned greenlet
-            self._loop_task = gevent.spawn(self._loop, app._get_current_object())
-            # Give the loop a chance to start
-            gevent.sleep(0.5)
-
-        try:
-            # This loop just waits for the client to disconnect.
+    def _run(self):
+        with self.app.app_context():
             while True:
+                msgs = consumer.consume(100000, timeout=0.1)
+                if not msgs:
+                    continue
+                for msg in msgs:
+                    if msg.error():
+                        if msg.error().code() == KafkaError._PARTITION_EOF:
+                            # Kafka Broker tells us we are too fast, sleep a bit.
+                            time.sleep(0.5)
+                            continue
+                        else:
+                            # Some other error occurred
+                            app.logger.error(f"Kafka error: {msg.error()}", exc_info=True)
+                            raise KafkaException(msg.error())
+
+                    # Process the message
+                    value = Subscription(msg.value()).to_json()
+                    self.broadcast(value.content.resource, value.content.action)
+
+    def register(self, ws, resource):
+        self.subscriptions[resource].add(ws)
+        producer.produce(
+            topic=f"bgpdata.parsed.subscription",
+            key=resource,
+            value=Subscription(resource=resource, action="subscribe"),
+            timestamp=int(time.time() * 1000)
+        )
+
+    def unregister(self, ws, resource):
+        self.subscriptions[resource].discard(ws)
+        if not self.subscriptions[resource]:
+            del self.subscriptions[resource]
+
+    def broadcast(self, resource, action):
+        if resource in self.subscriptions:
+            for ws in list(self.subscriptions[resource]):
                 try:
-                    # Try to receive with a timeout
-                    ws.receive(timeout=0.1)
+                    ws.send(action)
                 except Exception:
-                    # Connection is closed
-                    break
-        finally:
-            self.subscribers.discard(ws)
-
-    def _loop(self, app):
-        with app.app_context():
-            while len(self.subscribers) > 0:
-                data = self.fetch_func() 
-
-                for ws in list(self.subscribers):
-                    try:
-                        ws.send(str(data))
-                    except Exception:
-                        self.subscribers.discard(ws)
-
-                gevent.sleep(self.interval)
-                
-            self._loop_task = None
+                    self.unregister(ws, resource)

@@ -5,6 +5,10 @@ class Config():
     FLASK_HOST = os.getenv('FLASK_HOST')
     SECRET_KEY = os.getenv('SECRET_KEY')
 
+    # Kafka
+    KAFKA_FQDN = os.getenv('KAFKA_FQDN')
+    KAFKA_JMX_FQDN = os.getenv('KAFKA_JMX_FQDN')
+
     # Postgres
     POSTGRES_HOST = os.getenv('POSTGRES_HOST')
     POSTGRES_PORT = os.getenv('POSTGRES_PORT')
@@ -25,6 +29,8 @@ class Config():
             'ENVIRONMENT': Config.ENVIRONMENT,
             'SECRET_KEY': Config.SECRET_KEY,
             'FLASK_HOST': Config.FLASK_HOST,
+            'KAFKA_FQDN': Config.KAFKA_FQDN,
+            'KAFKA_JMX_FQDN': Config.KAFKA_JMX_FQDN,
             'POSTMARK_API_KEY': Config.POSTMARK_API_KEY,
             'POSTGRES_HOST': Config.POSTGRES_HOST,
             'POSTGRES_PORT': Config.POSTGRES_PORT,

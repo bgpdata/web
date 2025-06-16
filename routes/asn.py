@@ -2,12 +2,12 @@ from flask import Blueprint, render_template, abort, current_app as app
 from utils.database import PostgreSQL
 from sqlalchemy import text
 from datetime import datetime, timedelta
+import json
 
 # Create Blueprint
 asn_blueprint = Blueprint('as', __name__)
 
-@asn_blueprint.route("/<int:asn>")
-def asn(asn):
+def get_asn_data(asn):
     try:
         # Initialize database connection
         db = PostgreSQL()
@@ -247,22 +247,27 @@ def asn(asn):
             for row in downstream_details_result.fetchall()
         ]
 
+        return {
+            'asn': asn,
+            'as_name': asn_info_dict['as_name'],
+            'ipv4_count': ipv4_count,
+            'ipv6_count': ipv6_count,
+            'upstream_count': upstream_count,
+            'downstream_count': downstream_count,
+            'trend_data': trend_data,
+            'asn_info': asn_info_dict,
+            'upstream_asns': upstream_asns,
+            'downstream_asns': downstream_asns,
+            'prefixes_aggregates': prefixes_aggregates,
+            'prefixes': prefixes
+        }
     except Exception as e:
-        app.logger.error(f"Failed to retrieve AS{asn}: {str(e)}")
-        return abort(500, description="An error occurred")
+        app.logger.error(f"Failed to retrieve data for AS{asn}: {str(e)}")
+        return None
 
-    return render_template(
-        'pages/asn.html', 
-        asn=asn, 
-        as_name=asn_info_dict['as_name'],
-        ipv4_count=ipv4_count,
-        ipv6_count=ipv6_count,
-        upstream_count=upstream_count,
-        downstream_count=downstream_count,
-        trend_data=trend_data,
-        asn_info=asn_info_dict,
-        upstream_asns=upstream_asns,
-        downstream_asns=downstream_asns,
-        prefixes_aggregates=prefixes_aggregates,
-        prefixes=prefixes
-    )
+@asn_blueprint.route("/<int:asn>")
+def asn(asn):
+    data = get_asn_data(asn)
+    if data is None:
+        return abort(500, description="An error occurred")
+    return render_template('pages/asn.html', **data)

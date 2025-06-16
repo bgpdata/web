@@ -1,13 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, abort, session, current_app as app, jsonify
 from utils.text import time_ago, format_text, clean_text, alphanumeric_text, clean_text, sanitize_text, date_text
 from utils.socket import sock, WebSocketBroadcaster
-from utils.kafka import get_kafka_ingest_rate
+from utils.kafka import KafkaProducer
 from utils.scheduler import scheduler
 from utils.cache import cache, caching
 from utils.limiter import limiter
 from flask_compress import Compress
 from flask_talisman import Talisman
-from utils.jobs import example_job
+#from utils.jobs import example_job
 from utils.seo import get_sitemap
 from routes.asn import asn_blueprint
 from datetime import timedelta
@@ -40,6 +40,16 @@ def create_app():
     
     # Load configuration
     app.config.from_object(Config)
+
+    # Kafka Producer
+    try:
+        producer = KafkaProducer(
+            bootstrap_servers='kafka:29092',
+            value_serializer=lambda v: v.encode('utf-8')
+        )
+    except Exception as e:
+        app.logger.error(f"Failed to create Kafka producer: {e}")
+        producer = None
 
     # Configure logging
     # Remove any existing handlers
@@ -131,7 +141,7 @@ def create_app():
     # Initialize scheduler
     scheduler.init_app(app)
 
-    #scheduler.add_job(id='example_job', func=example_job, priority=0, days=30)
+    #scheduler.add_job(id='subscription_renewer', func=subscription_renewer, trigger='interval', seconds=60)
 
     # Register scheduler shutdown
     atexit.register(lambda: scheduler.shutdown(wait=False))
@@ -200,15 +210,29 @@ def create_app():
     WebSockets
     """
 
-    #ingest_rate_broadcaster = WebSocketBroadcaster(get_kafka_ingest_rate)
+    broadcaster = WebSocketBroadcaster()
 
-    #@sock.route('/ws/v1/rate')
-    #def ws_v1_rate(ws):
-    #    try:
-    #        app.logger.info("WebSocket connected")
-    #        ingest_rate_broadcaster.register(ws)
-    #    except Exception as e:
-    #        app.logger.error("WebSocket error: %s", str(e), exc_info=True)
+    @sock.route('/ws/v1/asn/<int:asn>')
+    def ws_v1_asn(ws, asn):
+        try:
+            app.logger.info(f"WebSocket connected for ASN {asn}")
+            broadcaster.register(ws, f"asn_{asn}")
+
+            if producer:
+                app.logger.info(f"Sending subscription request for ASN {asn}")
+                message = f"subscribe\t{asn}"
+                producer.send('asn-subscription-requests', message)
+
+            while True:
+                # Keep the connection open
+                data = ws.receive(timeout=60)
+                if data == 'ping':
+                    ws.send('pong')
+        except Exception as e:
+            app.logger.error("WebSocket error: %s", str(e), exc_info=True)
+        finally:
+            app.logger.info(f"WebSocket disconnected for ASN {asn}")
+            broadcaster.unregister(ws, f"asn_{asn}")
 
 
     """

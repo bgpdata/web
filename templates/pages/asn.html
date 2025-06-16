@@ -22,7 +22,7 @@ AS{{ asn }} {{ as_name }}
                 <div class="container__breadcrumbs">
                     <a href="/" class="breadcrumbs__item">Home</a>
                 </div>
-                <h2 class="container__title" id="asn">
+                <h2 class="container__title" id="asn-header">
                     AS{{ asn }}{% if as_name %}&nbsp;-&nbsp;{{ as_name }}{% endif %}
                 </h2>
             </div>
@@ -81,22 +81,22 @@ AS{{ asn }} {{ as_name }}
                                 <div class="metrics__card">
                                     <div class="card__eyebrow">IPv4</div>
                                     <div class="card__description">Advertised IPv4 Prefixes</div>
-                                    <div class="card__value">{{ ipv4_count }}</div>
+                                    <div class="card__value" id="ipv4-count">{{ ipv4_count }}</div>
                                 </div>
                                 <div class="metrics__card">
                                     <div class="card__eyebrow">IPv6</div>
                                     <div class="card__description">Advertised IPv6 Prefixes</div>
-                                    <div class="card__value">{{ ipv6_count }}</div>
+                                    <div class="card__value" id="ipv6-count">{{ ipv6_count }}</div>
                                 </div>
                                 <div class="metrics__card">
                                     <div class="card__eyebrow">Upstream ASNs</div>
                                     <div class="card__description">Routes received from</div>
-                                    <div class="card__value">{{ upstream_count }}</div>
+                                    <div class="card__value" id="upstream-count">{{ upstream_count }}</div>
                                 </div>
                                 <div class="metrics__card">
                                     <div class="card__eyebrow">Downstream ASNs</div>
                                     <div class="card__description">Routes provided to</div>
-                                    <div class="card__value">{{ downstream_count }}</div>
+                                    <div class="card__value" id="downstream-count">{{ downstream_count }}</div>
                                 </div>
                             </div>
                             <div class="content__charts">
@@ -104,7 +104,7 @@ AS{{ asn }} {{ as_name }}
                                 <div class="charts__item charts__item--span-5-columns" id="ips-graph"></div>
                             </div>
                             <div class="content__tables">
-                                <cds-table class="tables__item tables__item--span-16-columns cds-theme-zone-white" with-header="true">
+                                <cds-table id="asn-info-table" class="tables__item tables__item--span-16-columns cds-theme-zone-white" with-header="true">
                                     <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
                                         ASN Information
                                     </cds-table-header-title>
@@ -136,7 +136,7 @@ AS{{ asn }} {{ as_name }}
                                         </cds-table-row>
                                     </cds-table-body>
                                 </cds-table>
-                                <cds-table class="tables__item tables__item--span-8-columns cds-theme-zone-white" with-header="true" style="height: fit-content;">
+                                <cds-table id="upstream-asns-table" class="tables__item tables__item--span-8-columns cds-theme-zone-white" with-header="true" style="height: fit-content;">
                                     <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
                                         Upstream ASNs
                                     </cds-table-header-title>
@@ -158,7 +158,7 @@ AS{{ asn }} {{ as_name }}
                                         {% endfor %}
                                     </cds-table-body>
                                 </cds-table>
-                                <cds-table class="tables__item tables__item--span-8-columns cds-theme-zone-white" with-header="true" style="height: fit-content;">
+                                <cds-table id="downstream-asns-table" class="tables__item tables__item--span-8-columns cds-theme-zone-white" with-header="true" style="height: fit-content;">
                                     <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
                                         Downstream ASNs
                                     </cds-table-header-title>
@@ -186,7 +186,7 @@ AS{{ asn }} {{ as_name }}
                     <div class="content__panel" id="prefixes" aria-labelledby="tab-prefixes">
                         <div class="panel__content">
                             <div class="content__tables">
-                                <cds-table class="tables__item tables__item--span-16-columns cds-theme-zone-white" with-header="true">
+                                <cds-table id="aggregates-table" class="tables__item tables__item--span-16-columns cds-theme-zone-white" with-header="true">
                                     <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
                                         Aggregates
                                     </cds-table-header-title>
@@ -207,7 +207,7 @@ AS{{ asn }} {{ as_name }}
                                     </cds-table-body>
                                 </cds-table>
 
-                                <cds-table class="tables__item tables__item--span-16-columns cds-theme-zone-white" with-header="true">
+                                <cds-table id="advertised-prefixes-table" class="tables__item tables__item--span-16-columns cds-theme-zone-white" with-header="true">
                                     <cds-table-header-title slot="title" style="font-size: 1rem; margin-bottom: 0.5rem;">
                                         Advertised Prefixes
                                     </cds-table-header-title>
@@ -314,32 +314,38 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <script>
-    BGPDATA.create(
-      "bgp-explorer",
-      {
-        resource: "2409:875c:8500::/40",
-        rrcs: "0,1,2,3",
-        unix_timestamps: "TRUE",
-        ignoreReannouncements: true,
-        starttime: 1728129599,
-        endtime: 1728215999,
-      },
-      "bgp-explorer",
-      { disable: ["controls"] },
-    );
+    try {
+        const bgpDataOptions = {
+            resource: "2409:875c:8500::/40",
+            rrcs: "0,1,2,3",
+            unix_timestamps: "TRUE",
+            ignoreReannouncements: true,
+            starttime: 1728129599,
+            endtime: 1728215999,
+        };
+        const bgpDataExplorerOptions = {
+            disable: ["controls"]
+        };
+        BGPDATA.create(
+          "bgp-explorer",
+          bgpDataOptions,
+          "bgp-explorer",
+          bgpDataExplorerOptions,
+        );
+    } catch(e) {
+        console.error(e);
+    }
 </script>
 <script>
-    const data = {{ trend_data|tojson }}.flatMap(item => [
-        { date: item.time, value: item.v4_prefixes, group: 'IPv4 Prefixes' },
-        { date: item.time, value: item.v6_prefixes, group: 'IPv6 Prefixes' },
-        { date: item.time, value: item.v4_with_rpki, group: 'IPv4 with RPKI' },
-        { date: item.time, value: item.v6_with_rpki, group: 'IPv6 with RPKI' },
-        { date: item.time, value: item.v4_with_irr, group: 'IPv4 with IRR' },
-        { date: item.time, value: item.v6_with_irr, group: 'IPv6 with IRR' }
-    ]);
-    // Grab chart holder HTML element and initialize the chart
-    new Charts.LineChart(document.getElementById("trend-graph"), {
-        data,
+    const trendChart = new Charts.LineChart(document.getElementById("trend-graph"), {
+        data: {{ trend_data|tojson }}.flatMap(item => [
+            { date: item.time, value: item.v4_prefixes, group: 'IPv4 Prefixes' },
+            { date: item.time, value: item.v6_prefixes, group: 'IPv6 Prefixes' },
+            { date: item.time, value: item.v4_with_rpki, group: 'IPv4 with RPKI' },
+            { date: item.time, value: item.v6_with_rpki, group: 'IPv6 with RPKI' },
+            { date: item.time, value: item.v4_with_irr, group: 'IPv4 with IRR' },
+            { date: item.time, value: item.v6_with_irr, group: 'IPv6 with IRR' }
+        ]),
         options: {
             title: 'Originating Prefix Trend',
             axes: {
@@ -367,19 +373,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-</script>
-<script>
-    // Grab chart holder HTML element and initialize the chart
-    new Charts.PieChart(document.getElementById("ips-graph"), {
+
+    const ipPieChart = new Charts.PieChart(document.getElementById("ips-graph"), {
         data: [
-            {
-                group: 'IPv4',
-                value: {{ ipv4_count }}
-            },
-            {
-                group: 'IPv6',
-                value: {{ ipv6_count }}
-            }
+            { group: 'IPv4', value: {{ ipv4_count }} },
+            { group: 'IPv6', value: {{ ipv6_count }} }
         ],
         options: {
             title: 'Advertised IP Addresses',
@@ -392,5 +390,123 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const asn = {{ asn }};
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws/v1/asn/${asn}`;
+    let ws;
+    let pingInterval;
+
+    function connect() {
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => {
+            console.log('WebSocket connection established');
+            // Send a ping every 30 seconds to keep the connection alive
+            pingInterval = setInterval(() => {
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send('ping');
+                }
+            }, 30000);
+        };
+
+        ws.onmessage = (event) => {
+            console.log('WebSocket message received:', event.data);
+            const data = JSON.parse(event.data);
+            
+            // Update header
+            document.getElementById('asn-header').innerHTML = `AS${data.asn}${data.as_name ? '&nbsp;-&nbsp;' + data.as_name : ''}`;
+            
+            // Update metrics
+            document.getElementById('ipv4-count').textContent = data.ipv4_count;
+            document.getElementById('ipv6-count').textContent = data.ipv6_count;
+            document.getElementById('upstream-count').textContent = data.upstream_count;
+            document.getElementById('downstream-count').textContent = data.downstream_count;
+
+            // Update charts
+            trendChart.model.setData(data.trend_data.flatMap(item => [
+                { date: item.time, value: item.v4_prefixes, group: 'IPv4 Prefixes' },
+                { date: item.time, value: item.v6_prefixes, group: 'IPv6 Prefixes' },
+                { date: item.time, value: item.v4_with_rpki, group: 'IPv4 with RPKI' },
+                { date: item.time, value: item.v6_with_rpki, group: 'IPv6 with RPKI' },
+                { date: item.time, value: item.v4_with_irr, group: 'IPv4 with IRR' },
+                { date: item.time, value: item.v6_with_irr, group: 'IPv6 with IRR' }
+            ]));
+            ipPieChart.model.setData([
+                { group: 'IPv4', value: data.ipv4_count },
+                { group: 'IPv6', value: data.ipv6_count }
+            ]);
+
+            // Update ASN Info table
+            const asnInfoTableBody = document.querySelector('#asn-info-table cds-table-body');
+            asnInfoTableBody.innerHTML = `
+                <cds-table-row>
+                    <cds-table-cell>${data.asn_info.as_name || ''}</cds-table-cell>
+                    <cds-table-cell>${data.asn_info.org_id || ''}</cds-table-cell>
+                    <cds-table-cell>${data.asn_info.org_name || ''}</cds-table-cell>
+                    <cds-table-cell>${data.asn_info.address === ', ' ? '' : data.asn_info.address || ''}</cds-table-cell>
+                    <cds-table-cell>${data.asn_info.city || ''}</cds-table-cell>
+                    <cds-table-cell>${data.asn_info.state_prov || ''}</cds-table-cell>
+                    <cds-table-cell>${data.asn_info.country || ''}</cds-table-cell>
+                    <cds-table-cell>${data.asn_info.source || ''}</cds-table-cell>
+                </cds-table-row>
+            `;
+
+            // Update Upstream ASNs table
+            const upstreamTableBody = document.querySelector('#upstream-asns-table cds-table-body');
+            upstreamTableBody.innerHTML = data.upstream_asns.map(up_asn => `
+                <cds-table-row>
+                    <cds-table-cell>AS${up_asn.asn}</cds-table-cell>
+                    <cds-table-cell>${up_asn.name}</cds-table-cell>
+                </cds-table-row>
+            `).join('');
+
+            // Update Downstream ASNs table
+            const downstreamTableBody = document.querySelector('#downstream-asns-table cds-table-body');
+            downstreamTableBody.innerHTML = data.downstream_asns.map(down_asn => `
+                <cds-table-row>
+                    <cds-table-cell>AS${down_asn.asn}</cds-table-cell>
+                    <cds-table-cell>${down_asn.name}</cds-table-cell>
+                </cds-table-row>
+            `).join('');
+            
+            // Update Aggregates table
+            const aggregatesTableBody = document.querySelector('#aggregates-table cds-table-body');
+            aggregatesTableBody.innerHTML = data.prefixes_aggregates.map(prefix => `
+                <cds-table-row>
+                    <cds-table-cell>${prefix}</cds-table-cell>
+                </cds-table-row>
+            `).join('');
+
+            // Update Advertised Prefixes table
+            const advertisedPrefixesTableBody = document.querySelector('#advertised-prefixes-table cds-table-body');
+            advertisedPrefixesTableBody.innerHTML = data.prefixes.map(prefix => `
+                <cds-table-row>
+                    <cds-table-cell>${prefix.prefix}</cds-table-cell>
+                    <cds-table-cell>${prefix.rpki_origin_as || ''}</cds-table-cell>
+                    <cds-table-cell>${prefix.irr_origin_as || ''}</cds-table-cell>
+                    <cds-table-cell>${prefix.last_changed || ''}</cds-table-cell>
+                    <cds-table-cell>${prefix.irr_description || ''}</cds-table-cell>
+                    <cds-table-cell>${prefix.irr_source || ''}</cds-table-cell>
+                </cds-table-row>
+            `).join('');
+        };
+
+        ws.onclose = () => {
+            console.log('WebSocket connection closed. Reconnecting...');
+            clearInterval(pingInterval);
+            setTimeout(connect, 5000); // Reconnect after 5 seconds
+        };
+
+        ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+            ws.close();
+        };
+    }
+
+    connect();
+});
 </script>
 {% endblock %}

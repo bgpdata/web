@@ -38,6 +38,7 @@ COPY requirements.txt .
 
 # Install any dependencies
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -e protocol/python
 
 # Copy the application code into the container
 COPY . .
