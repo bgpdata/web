@@ -15,7 +15,7 @@ def run(workers="1", host="localhost", port=8080, reload=False):
     # Validate the configuration
     Config.validate()
 
-    if reload:
+    if reload and False:
         # Get the app instance
         from app import create_app
         app = create_app()
@@ -27,6 +27,15 @@ def run(workers="1", host="localhost", port=8080, reload=False):
             "--bind", f"{host}:{port}", 
             "--workers", workers,
             "--worker-class", "gevent",
+            "--timeout", "300",  # Increase timeout to 5 minutes
+            "--keep-alive", "5",  # Keep connections alive for 5 seconds
+            "--max-requests", "1000",  # Restart workers after 1000 requests
+            "--max-requests-jitter", "50",  # Add some randomness to prevent all workers from restarting at once
+            "--worker-connections", "1000",  # Maximum number of simultaneous connections per worker
+            "--log-level", "info",
+            "--graceful-timeout", "120",  # Give workers 2 minutes to finish their work
+            "--preload",  # Preload the application code
+            "--threads", "4",  # Use 4 threads per worker
             "app:app"
         ])
 

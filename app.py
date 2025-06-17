@@ -2,12 +2,10 @@ from flask import Flask, render_template, request, redirect, url_for, abort, cur
 from utils.text import time_ago, format_text, clean_text, alphanumeric_text, clean_text, sanitize_text, date_text
 from routes.asn import asn_blueprint, asn_api_v1_blueprint
 from utils.socket import sock, broadcaster
-from utils.scheduler import scheduler
 from utils.cache import cache, caching
 from utils.limiter import limiter
 from flask_compress import Compress
 from flask_talisman import Talisman
-#from utils.jobs import example_job
 from utils.seo import get_sitemap
 from datetime import timedelta
 from logging import StreamHandler
@@ -17,6 +15,9 @@ import atexit
 import sass # type: ignore
 import sys
 import re
+import gevent
+from gevent import monkey
+monkey.patch_all()
 
 def compile_scss():
     scss_file = 'static/styles/main.scss'
@@ -121,22 +122,7 @@ def create_app():
             scripts.append(script)
             return ''
         return dict(script=script, environment=app.config['ENVIRONMENT'], i18n=i18n, scripts=lambda: scripts)
-    
 
-    """
-    Scheduler
-    """
-
-    # Initialize scheduler
-    scheduler.init_app(app)
-
-    #scheduler.add_job(id='subscription_renewer', func=subscription_renewer, trigger='interval', seconds=60)
-
-    # Register scheduler shutdown
-    atexit.register(lambda: scheduler.shutdown(wait=False))
-
-    # Start scheduler
-    scheduler.start()
 
     """
     SEO
@@ -197,7 +183,7 @@ def create_app():
             while True:
                 try:
                     # Keep the connection open and handle ping messages
-                    data = ws.receive(timeout=60)
+                    data = ws.receive(timeout=30)  # Reduced timeout to 30 seconds
                     if data == 'ping':
                         ws.send('pong')
                 except Exception as e:
