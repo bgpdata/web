@@ -319,7 +319,7 @@ AS{{ asn }}
                 Promise.all([
                     // Basic info
                     fetch(`/api/v1/as/info/${asn}`).then(r => r.json()).then(info => {
-                        document.getElementById('asn-name').textContent = info.as_name ? ` - ${info.org_name}` : '';
+                        document.getElementById('asn-name').textContent = info.as_name ? ` - ${info.as_name}` : '';
                         
                         // Change skeleton to regular table
                         const asnInfoTable = document.getElementById('asn-info-table');
