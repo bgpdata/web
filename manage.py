@@ -15,7 +15,7 @@ def run(workers="1", host="localhost", port=8080, reload=False):
     # Validate the configuration
     Config.validate()
 
-    if reload and False:
+    if reload:
         # Get the app instance
         from app import create_app
         app = create_app()
